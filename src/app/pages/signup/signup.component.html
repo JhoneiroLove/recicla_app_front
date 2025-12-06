@@ -1,71 +1,110 @@
-
 <div class="bootstrap-wrapper">
   <div class="container">
     <div class="row">
       <div class="col-md-6 offset-md-3">
         <mat-card>
-        <div class="container text-center">
-          <img src="../../../assets/icon.png" width="100" height="100">
-        </div>
-
-        <h1 class="text-center">Registrate</h1>
-
-        <form [formGroup]="signupForm" (ngSubmit)="formSubmit()">
-          <mat-form-field class="full-width" appearance="outline">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre" placeholder="Digite su nombre">
-            <mat-error *ngIf="signupForm.get('nombre')!.invalid && signupForm.get('nombre')!.touched">El nombre es requerido y solo puede contener letras max. 12 caracteres</mat-error>
-          </mat-form-field>
-
-          <mat-form-field class="full-width" appearance="outline">
-            <mat-label>Edad</mat-label>
-            <input matInput formControlName="edad" placeholder="Digite su edad" type="number">
-            <mat-error *ngIf="signupForm.get('edad')!.invalid && signupForm.get('edad')!.touched">La edad debe estar entre 16 y 100 años</mat-error>
-          </mat-form-field>
-
-          <mat-form-field class="full-width" appearance="outline">
-            <mat-label>Teléfono</mat-label>
-            <input matInput formControlName="telefono" placeholder="Digite su teléfono">
-            <mat-hint>El numero de telefono debe ser único</mat-hint>
-            <mat-error *ngIf="signupForm.get('telefono')!.invalid && signupForm.get('telefono')!.touched">Ingresar numero teléfono valido</mat-error>
-          </mat-form-field>
-
-          <mat-form-field class="full-width" appearance="outline">
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="correo" placeholder="Digite su email" type="email">
-            <mat-hint>El correo de usuario debe ser único</mat-hint>
-            <mat-error *ngIf="signupForm.get('correo')!.invalid && signupForm.get('correo')!.touched">Introduzca un correo válido</mat-error>
-          </mat-form-field>
-
-          <mat-form-field class="full-width" appearance="outline">
-            <mat-label>Nombre de usuario</mat-label>
-            <input matInput formControlName="username" placeholder="Digite su nombre de usuario">
-            <mat-hint>El nombre de usuario debe ser único</mat-hint>
-            <mat-error *ngIf="signupForm.get('username')!.invalid && signupForm.get('username')!.touched">El nombre de usuario es requerido max. 9 caracteres</mat-error>
-          </mat-form-field>
-
-          <mat-form-field class="full-width" appearance="outline">
-            <mat-label>Contraseña</mat-label>
-            <input matInput formControlName="password" placeholder="Digite su contraseña" type="password">
-            <mat-error *ngIf="signupForm.get('password')!.invalid && signupForm.get('password')!.touched">La contraseña debe tener al menos 3 caracteres</mat-error>
-          </mat-form-field>
-
-          <mat-form-field class="full-width" appearance="outline">
-            <mat-label>DNI</mat-label>
-            <input matInput formControlName="dni" placeholder="Digite su DNI">
-            <mat-hint>El numero de DNI debe ser único</mat-hint>
-            <mat-error *ngIf="signupForm.get('dni')!.invalid && signupForm.get('dni')!.touched">Ingresar un numero de DNI valido</mat-error>
-          </mat-form-field>
-
           <div class="container text-center">
-            <button type="submit" mat-raised-button>Ingresar</button>
+            <img src="../../../assets/icon.png" width="100" height="100">
           </div>
-        </form>
+
+          <h1 class="text-center">Registrate</h1>
+
+          <!-- Sección de conexión de wallet -->
+          <div class="wallet-section" style="margin-bottom: 20px;">
+            <div *ngIf="!walletConnected" class="text-center">
+              <button type="button" mat-raised-button color="primary" (click)="connectWallet()"
+                [disabled]="isConnectingWallet" style="width: 100%;">
+                <mat-icon *ngIf="!isConnectingWallet">account_balance_wallet</mat-icon>
+                <mat-spinner *ngIf="isConnectingWallet" diameter="20"
+                  style="display: inline-block; margin-right: 8px;"></mat-spinner>
+                {{ isConnectingWallet ? 'Conectando...' : 'Conectar MetaMask' }}
+              </button>
+              <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                Debes conectar tu wallet de MetaMask para registrarte
+              </p>
+            </div>
+
+            <div *ngIf="walletConnected" class="wallet-connected"
+              style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; text-align: center;">
+              <mat-icon style="color: #4caf50; vertical-align: middle;">check_circle</mat-icon>
+              <span style="margin-left: 8px; color: #2e7d32; font-weight: 500;">Wallet Conectada</span>
+              <p style="margin: 8px 0 0 0; font-size: 12px; color: #555; word-break: break-all;">
+                {{ walletAddress.substring(0, 6) }}...{{ walletAddress.substring(38) }}
+              </p>
+            </div>
+          </div>
+
+          <form [formGroup]="signupForm" (ngSubmit)="formSubmit()">
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Nombre</mat-label>
+              <input matInput formControlName="nombre" placeholder="Digite su nombre">
+              <mat-error *ngIf="signupForm.get('nombre')!.invalid && signupForm.get('nombre')!.touched">El nombre es
+                requerido y solo puede contener letras max. 12 caracteres</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Edad</mat-label>
+              <input matInput formControlName="edad" placeholder="Digite su edad" type="number">
+              <mat-error *ngIf="signupForm.get('edad')!.invalid && signupForm.get('edad')!.touched">La edad debe estar
+                entre 16 y 100 años</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Teléfono</mat-label>
+              <input matInput formControlName="telefono" placeholder="Digite su teléfono">
+              <mat-hint>El numero de telefono debe ser único</mat-hint>
+              <mat-error *ngIf="signupForm.get('telefono')!.invalid && signupForm.get('telefono')!.touched">Ingresar
+                numero teléfono valido</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="correo" placeholder="Digite su email" type="email">
+              <mat-hint>El correo de usuario debe ser único</mat-hint>
+              <mat-error *ngIf="signupForm.get('correo')!.invalid && signupForm.get('correo')!.touched">Introduzca un
+                correo válido</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Nombre de usuario</mat-label>
+              <input matInput formControlName="username" placeholder="Digite su nombre de usuario">
+              <mat-hint>El nombre de usuario debe ser único</mat-hint>
+              <mat-error *ngIf="signupForm.get('username')!.invalid && signupForm.get('username')!.touched">El nombre de
+                usuario es requerido max. 9 caracteres</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Contraseña</mat-label>
+              <input matInput formControlName="password" placeholder="Digite su contraseña" type="password">
+              <mat-error *ngIf="signupForm.get('password')!.invalid && signupForm.get('password')!.touched">La
+                contraseña debe tener al menos 3 caracteres</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>DNI</mat-label>
+              <input matInput formControlName="dni" placeholder="Digite su DNI">
+              <mat-hint>El numero de DNI debe ser único</mat-hint>
+              <mat-error *ngIf="signupForm.get('dni')!.invalid && signupForm.get('dni')!.touched">Ingresar un numero de
+                DNI valido</mat-error>
+            </mat-form-field>
+
+            <!-- Campo oculto para wallet address (se llena automáticamente) -->
+            <input type="hidden" formControlName="walletAddress">
+
+            <div class="container text-center">
+              <button type="submit" mat-raised-button [disabled]="!walletConnected || signupForm.invalid">
+                Registrar
+              </button>
+              <p *ngIf="!walletConnected" style="margin-top: 10px; font-size: 12px; color: #ff5722;">
+                Conecta tu wallet para habilitar el registro
+              </p>
+            </div>
+          </form>
 
 
 
 
-      </mat-card>
+        </mat-card>
         <br><br><br>
       </div>
     </div>

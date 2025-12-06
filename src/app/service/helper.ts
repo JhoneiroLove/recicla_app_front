@@ -1,2 +1,2 @@
-let baserUrl = 'https://reciclaupao.rj.r.appspot.com'
+let baserUrl = 'http://localhost:8080'
 export default baserUrl;

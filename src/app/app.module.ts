@@ -10,21 +10,25 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { SignupComponent } from './pages/signup/signup.component';
 import { LoginComponent } from './pages/login/login.component';
 
-import {MatButtonModule} from '@angular/material/button';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
-import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatExpansionModule } from '@angular/material/expansion';
 
-import {MatCardModule} from '@angular/material/card';
-import {MatToolbarModule} from '@angular/material/toolbar';
-import {MatIconModule} from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HomeComponent } from './pages/home/home.component';
 import { DashboardComponent } from './pages/admin/dashboard/dashboard.component';
 import { UserDashboardComponent } from './pages/user/user-dashboard/user-dashboard.component';
 
-import { AuthInterceptor, authInterceptorProviders } from './service/auth.interceptor';
+import {
+  AuthInterceptor,
+  authInterceptorProviders,
+} from './service/auth.interceptor';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -56,7 +60,6 @@ import { PerfilComponent } from './pages/perfil/perfil.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { MatSelectModule } from '@angular/material/select';
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -83,7 +86,6 @@ import { MatSelectModule } from '@angular/material/select';
     VerEstadisticaComponent,
     PerfilComponent,
     FooterComponent,
-
   ],
   imports: [
     BrowserModule,
@@ -98,6 +100,7 @@ import { MatSelectModule } from '@angular/material/select';
     MatCardModule,
     MatToolbarModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     FlexLayoutModule,
     MatSidenavModule,
     MatListModule,
@@ -108,15 +111,15 @@ import { MatSelectModule } from '@angular/material/select';
     MatPaginatorModule,
     NgChartsModule,
     MatSelectModule,
-    MatExpansionModule
+    MatExpansionModule,
   ],
   providers: [
     {
-        provide: HTTP_INTERCEPTORS,
-        useClass: AuthInterceptor,
-        multi: true
-    }
-],
-  bootstrap: [AppComponent]
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    },
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
