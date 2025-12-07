@@ -19,49 +19,50 @@ import { RResiduoComponent } from './pages/r-residuo/r-residuo.component';
 import { VerResiduoComponent } from './pages/ver-residuo/ver-residuo.component';
 import { VerEstadisticaComponent } from './pages/ver-estadistica/ver-estadistica.component';
 import { PerfilComponent } from './pages/perfil/perfil.component';
+import { PanelValidacionOngComponent } from './pages/panel-validacion-ong/panel-validacion-ong.component';
 
 const routes: Routes = [
   {
-    path:'',
-    component:HomeComponent,
-    pathMatch:'full'
+    path: '',
+    component: HomeComponent,
+    pathMatch: 'full',
   },
   {
-    path:'signup',
-    component:SignupComponent,
-    pathMatch:'full'
+    path: 'signup',
+    component: SignupComponent,
+    pathMatch: 'full',
   },
   {
-    path:'login',
-    component:LoginComponent,
-    pathMatch:'full'
+    path: 'login',
+    component: LoginComponent,
+    pathMatch: 'full',
   },
   {
-    path:'admin',
-    component:DashboardComponent,
+    path: 'admin',
+    component: DashboardComponent,
     canActivate: [AdministradorGuard],
     children: [
       {
         path: 'registrar-recompensa',
-        component: RegistrarRecompensaComponent
+        component: RegistrarRecompensaComponent,
       },
       {
         path: 'registrar-residuo',
-        component: RResiduoComponent
+        component: RResiduoComponent,
       },
       {
         path: 'ver-residuo',
-        component: VerResiduoComponent
+        component: VerResiduoComponent,
       },
       {
-        path:'ver-recompensa',
-        component:VerRecompensaComponent
+        path: 'ver-recompensa',
+        component: VerRecompensaComponent,
       },
       {
-        path:'perfil',
-        component:PerfilComponent
-      }
-    ]
+        path: 'perfil',
+        component: PerfilComponent,
+      },
+    ],
   },
   {
     path: 'user',
@@ -70,50 +71,52 @@ const routes: Routes = [
     children: [
       {
         path: 'registrar-actividad',
-        component: RActividadComponent
+        component: RActividadComponent,
       },
       {
-        path:'ver-historial',
-        component:VHistorialComponent
+        path: 'ver-historial',
+        component: VHistorialComponent,
       },
       {
-        path:'ver-catalogo',
-        component:VerCatalogoComponent
+        path: 'ver-catalogo',
+        component: VerCatalogoComponent,
       },
       {
-        path:'ver-recompensa',
-        component:VerRecompensaComponent
+        path: 'ver-recompensa',
+        component: VerRecompensaComponent,
       },
       {
-        path:'crear-comunidad',
-        component:RComunidadComponent
+        path: 'crear-comunidad',
+        component: RComunidadComponent,
       },
       {
-        path:'ver-comunidad',
-        component:VerComunidadComponent
+        path: 'ver-comunidad',
+        component: VerComunidadComponent,
       },
       {
-        path:'ver-estadistica',
-        component:VerEstadisticaComponent
+        path: 'ver-estadistica',
+        component: VerEstadisticaComponent,
       },
       {
-        path:'perfil',
-        component:PerfilComponent
+        path: 'perfil',
+        component: PerfilComponent,
       },
-    ]
-
+    ],
   },
   {
-    path:'list-recompensa',
-    component:ListRecompensaComponent,
-    pathMatch:'full'
+    path: 'list-recompensa',
+    component: ListRecompensaComponent,
+    pathMatch: 'full',
   },
-
-  
+  {
+    path: 'validacion-ong',
+    component: PanelValidacionOngComponent,
+    pathMatch: 'full',
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

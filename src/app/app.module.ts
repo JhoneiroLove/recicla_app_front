@@ -59,6 +59,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { PerfilComponent } from './pages/perfil/perfil.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { MatSelectModule } from '@angular/material/select';
+import { PanelValidacionOngComponent } from './pages/panel-validacion-ong/panel-validacion-ong.component';
 
 @NgModule({
   declarations: [
@@ -86,6 +87,7 @@ import { MatSelectModule } from '@angular/material/select';
     VerEstadisticaComponent,
     PerfilComponent,
     FooterComponent,
+    PanelValidacionOngComponent,
   ],
   imports: [
     BrowserModule,

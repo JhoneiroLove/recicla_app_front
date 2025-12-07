@@ -1,0 +1,153 @@
+<div class="container-panel">
+  <div class="header">
+    <h1>🌿 Panel de Validación ONG</h1>
+    <p class="subtitle">Revisa y aprueba actividades de reciclaje con evidencia en blockchain</p>
+    <button class="btn-refresh" (click)="cargarPropuestas()" [disabled]="cargando">
+      <span *ngIf="!cargando">🔄 Actualizar</span>
+      <span *ngIf="cargando">⏳ Cargando...</span>
+    </button>
+  </div>
+
+  <!-- Indicador de carga -->
+  <div *ngIf="cargando" class="loading">
+    <div class="spinner"></div>
+    <p>Cargando propuestas pendientes...</p>
+  </div>
+
+  <!-- Lista vacía -->
+  <div *ngIf="!cargando && propuestasPendientes.length === 0" class="empty-state">
+    <div class="empty-icon">✅</div>
+    <h3>No hay propuestas pendientes</h3>
+    <p>Todas las actividades han sido procesadas</p>
+  </div>
+
+  <!-- Lista de propuestas -->
+  <div *ngIf="!cargando && propuestasPendientes.length > 0" class="propuestas-grid">
+    <div *ngFor="let propuesta of propuestasPendientes" class="propuesta-card">
+
+      <!-- Header de la tarjeta -->
+      <div class="card-header">
+        <span class="badge-id">Actividad #{{propuesta.actividadId}}</span>
+        <span class="badge-aprobaciones">{{propuesta.aprobaciones}}/2 Aprobaciones</span>
+      </div>
+
+      <!-- Evidencia IPFS -->
+      <div class="evidencia-container" *ngIf="isValidIPFS(propuesta.evidenciaIPFS)">
+        <img [src]="getIPFSUrl(propuesta.evidenciaIPFS)" alt="Evidencia IPFS" class="evidencia-img"
+          (click)="verEvidenciaCompleta(propuesta.evidenciaIPFS)" />
+        <div class="ipfs-overlay">
+          <span class="ipfs-hash">📎 {{propuesta.evidenciaIPFS.substring(0, 15)}}...</span>
+          <button class="btn-ver-completa" (click)="verEvidenciaCompleta(propuesta.evidenciaIPFS)">
+            🔍 Ver completa
+          </button>
+        </div>
+      </div>
+
+      <div class="evidencia-placeholder" *ngIf="!isValidIPFS(propuesta.evidenciaIPFS)">
+        <span>⚠️ Evidencia no disponible</span>
+      </div>
+
+      <!-- Información de la actividad -->
+      <div class="info-section">
+        <div class="info-row">
+          <span class="label">👤 Usuario:</span>
+          <span class="value">{{propuesta.usuarioWallet.substring(0,
+            10)}}...{{propuesta.usuarioWallet.substring(38)}}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">♻️ Material:</span>
+          <span class="value material-badge">{{getNombreMaterial(propuesta.tipoMaterial)}}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">⚖️ Peso:</span>
+          <span class="value">{{propuesta.pesoKg}} kg</span>
+        </div>
+
+        <div class="info-row highlight">
+          <span class="label">🪙 Tokens calculados:</span>
+          <span class="value tokens">{{propuesta.tokensCalculados}} REC</span>
+        </div>
+      </div>
+
+      <!-- Información blockchain -->
+      <div class="blockchain-info" *ngIf="propuesta.transactionHash">
+        <div class="info-row-small">
+          <span class="label-small">TX Hash:</span>
+          <span class="value-small">{{propuesta.transactionHash.substring(0, 20)}}...</span>
+        </div>
+        <div class="info-row-small">
+          <span class="label-small">Bloque:</span>
+          <span class="value-small">#{{propuesta.blockNumber}}</span>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="actions">
+        <button class="btn-aprobar" (click)="abrirFormularioAprobar(propuesta)">
+          ✅ Aprobar
+        </button>
+        <button class="btn-rechazar" (click)="abrirFormularioRechazar(propuesta)">
+          ❌ Rechazar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal de formulario -->
+  <div class="modal-overlay" *ngIf="mostrarFormulario" (click)="cerrarFormulario()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h2 *ngIf="accionSeleccionada === 'aprobar'">✅ Aprobar Actividad #{{actividadSeleccionada?.actividadId}}</h2>
+        <h2 *ngIf="accionSeleccionada === 'rechazar'">❌ Rechazar Actividad #{{actividadSeleccionada?.actividadId}}</h2>
+        <button class="btn-close" (click)="cerrarFormulario()">×</button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Resumen de la actividad -->
+        <div class="resumen-actividad">
+          <p><strong>Usuario:</strong> {{actividadSeleccionada?.usuarioWallet}}</p>
+          <p><strong>Material:</strong> {{getNombreMaterial(actividadSeleccionada?.tipoMaterial || '')}}</p>
+          <p><strong>Peso:</strong> {{actividadSeleccionada?.pesoKg}} kg</p>
+          <p><strong>Tokens:</strong> {{actividadSeleccionada?.tokensCalculados}} REC</p>
+        </div>
+
+        <!-- Formulario de validador -->
+        <div class="form-group">
+          <label for="wallet">🔑 Wallet del Validador (ONG)</label>
+          <input type="text" id="wallet" class="form-input" [(ngModel)]="walletAddress" placeholder="0x..." />
+        </div>
+
+        <div class="form-group">
+          <label for="privateKey">🔒 Clave Privada (para firmar transacción)</label>
+          <input type="password" id="privateKey" class="form-input" [(ngModel)]="privateKey"
+            placeholder="Clave privada del validador" />
+          <small class="help-text">⚠️ Tu clave privada NUNCA se almacena, solo se usa para firmar la transacción</small>
+        </div>
+
+        <!-- Razón de rechazo (solo para rechazar) -->
+        <div class="form-group" *ngIf="accionSeleccionada === 'rechazar'">
+          <label for="razon">📝 Razón del Rechazo</label>
+          <textarea id="razon" class="form-textarea" [(ngModel)]="razonRechazo"
+            placeholder="Explica por qué se rechaza esta actividad..." rows="4"></textarea>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="cerrarFormulario()">Cancelar</button>
+        <button class="btn-confirmar" [class.btn-aprobar-confirm]="accionSeleccionada === 'aprobar'"
+          [class.btn-rechazar-confirm]="accionSeleccionada === 'rechazar'" (click)="ejecutarAccion()">
+          <span *ngIf="accionSeleccionada === 'aprobar'">✅ Confirmar Aprobación</span>
+          <span *ngIf="accionSeleccionada === 'rechazar'">❌ Confirmar Rechazo</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
