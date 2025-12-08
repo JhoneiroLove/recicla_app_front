@@ -60,6 +60,8 @@ import { PerfilComponent } from './pages/perfil/perfil.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { MatSelectModule } from '@angular/material/select';
 import { PanelValidacionOngComponent } from './pages/panel-validacion-ong/panel-validacion-ong.component';
+import { OngDashboardComponent } from './pages/ong/ong-dashboard/ong-dashboard.component';
+import { SlidebarOngComponent } from './components/slidebar-ong/slidebar-ong.component';
 
 @NgModule({
   declarations: [
@@ -88,6 +90,8 @@ import { PanelValidacionOngComponent } from './pages/panel-validacion-ong/panel-
     PerfilComponent,
     FooterComponent,
     PanelValidacionOngComponent,
+    OngDashboardComponent,
+    SlidebarOngComponent,
   ],
   imports: [
     BrowserModule,

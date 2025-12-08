@@ -129,21 +129,21 @@ export class SignupComponent implements OnInit, OnDestroy {
   }
 
   private async handleNetworkChanged(chainId: string): Promise<void> {
-    const isAmoy = chainId === '0x13882'; // Polygon Amoy
+    const isCorrect = chainId === '0x7a69'; // Hardhat Local (31337)
 
-    if (!isAmoy && this.walletConnected) {
+    if (!isCorrect && this.walletConnected) {
       const result = await Swal.fire({
         icon: 'warning',
         title: 'Red cambiada',
-        text: 'Has cambiado a una red diferente a Polygon Amoy. ¿Deseas volver a Amoy?',
+        text: 'Has cambiado a una red diferente. ¿Deseas volver a Hardhat Local?',
         showCancelButton: true,
-        confirmButtonText: 'Cambiar a Amoy',
+        confirmButtonText: 'Cambiar red',
         cancelButtonText: 'Cancelar',
       });
 
       if (result.isConfirmed) {
         try {
-          await this.web3Service.switchToAmoyNetwork();
+          await this.web3Service.switchToActiveNetwork();
         } catch (error) {
           console.error('Error cambiando de red:', error);
         }

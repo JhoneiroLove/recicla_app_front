@@ -1,6 +1,19 @@
 import { Injectable } from '@angular/core';
 import Swal from 'sweetalert2';
 
+// Configuración de Hardhat Local (para desarrollo)
+const HARDHAT_LOCAL = {
+  chainId: '0x7a69', // 31337 en hexadecimal
+  chainName: 'Hardhat Local',
+  nativeCurrency: {
+    name: 'ETH',
+    symbol: 'ETH',
+    decimals: 18,
+  },
+  rpcUrls: ['http://127.0.0.1:8545'],
+  blockExplorerUrls: [],
+};
+
 // Configuración de Polygon Amoy Testnet
 const AMOY_NETWORK = {
   chainId: '0x13882', // 80002 en hexadecimal
@@ -13,6 +26,9 @@ const AMOY_NETWORK = {
   rpcUrls: ['https://rpc-amoy.polygon.technology/'],
   blockExplorerUrls: ['https://amoy.polygonscan.com/'],
 };
+
+// Red activa (cambiar según entorno)
+const ACTIVE_NETWORK = HARDHAT_LOCAL; // Cambiar a AMOY_NETWORK para producción
 
 declare global {
   interface Window {
@@ -85,26 +101,26 @@ export class Web3Service {
   }
 
   /**
-   * Verifica si está en la red Polygon Amoy
+   * Verifica si está en la red activa configurada
    */
-  async isAmoyNetwork(): Promise<boolean> {
+  async isCorrectNetwork(): Promise<boolean> {
     const chainId = await this.getCurrentChainId();
-    return chainId === AMOY_NETWORK.chainId;
+    return chainId === ACTIVE_NETWORK.chainId;
   }
 
   /**
-   * Cambia a la red Polygon Amoy
+   * Cambia a la red activa configurada
    */
-  async switchToAmoyNetwork(): Promise<void> {
+  async switchToActiveNetwork(): Promise<void> {
     if (!this.isMetaMaskInstalled()) {
       throw new Error('MetaMask no está instalado');
     }
 
     try {
-      // Intentar cambiar a la red Amoy
+      // Intentar cambiar a la red activa
       await this.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: AMOY_NETWORK.chainId }],
+        params: [{ chainId: ACTIVE_NETWORK.chainId }],
       });
     } catch (error: any) {
       // Si la red no está agregada (error 4902), agregarla
@@ -112,12 +128,10 @@ export class Web3Service {
         try {
           await this.ethereum.request({
             method: 'wallet_addEthereumChain',
-            params: [AMOY_NETWORK],
+            params: [ACTIVE_NETWORK],
           });
         } catch (addError: any) {
-          throw new Error(
-            'Error al agregar la red Polygon Amoy: ' + addError.message
-          );
+          throw new Error('Error al agregar la red: ' + addError.message);
         }
       } else if (error.code === 4001) {
         throw new Error('Cambio de red rechazado por el usuario');
@@ -135,7 +149,7 @@ export class Web3Service {
   }
 
   /**
-   * Flujo completo: conectar wallet y verificar/cambiar a Amoy
+   * Flujo completo: conectar wallet y verificar/cambiar a red activa
    */
   async connectAndSwitchNetwork(): Promise<string> {
     // 1. Verificar MetaMask
@@ -167,30 +181,30 @@ export class Web3Service {
     }
 
     // 3. Verificar red
-    const isAmoy = await this.isAmoyNetwork();
+    const isCorrect = await this.isCorrectNetwork();
 
-    if (!isAmoy) {
+    if (!isCorrect) {
       // Mostrar diálogo para cambiar de red
       const result = await Swal.fire({
         icon: 'info',
         title: 'Red incorrecta',
         html: `
           <p>Actualmente estás en una red diferente.</p>
-          <p>Necesitas cambiar a <strong>Polygon Amoy Testnet</strong> para continuar.</p>
+          <p>Necesitas cambiar a <strong>${ACTIVE_NETWORK.chainName}</strong> para continuar.</p>
         `,
         showCancelButton: true,
-        confirmButtonText: 'Cambiar a Amoy',
+        confirmButtonText: `Cambiar a ${ACTIVE_NETWORK.chainName}`,
         cancelButtonText: 'Cancelar',
       });
 
       if (result.isConfirmed) {
         try {
-          await this.switchToAmoyNetwork();
+          await this.switchToActiveNetwork();
 
           await Swal.fire({
             icon: 'success',
             title: 'Red cambiada',
-            text: 'Ahora estás conectado a Polygon Amoy Testnet',
+            text: `Ahora estás conectado a ${ACTIVE_NETWORK.chainName}`,
             timer: 2000,
             showConfirmButton: false,
           });

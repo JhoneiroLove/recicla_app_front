@@ -20,6 +20,8 @@ import { VerResiduoComponent } from './pages/ver-residuo/ver-residuo.component';
 import { VerEstadisticaComponent } from './pages/ver-estadistica/ver-estadistica.component';
 import { PerfilComponent } from './pages/perfil/perfil.component';
 import { PanelValidacionOngComponent } from './pages/panel-validacion-ong/panel-validacion-ong.component';
+import { OngDashboardComponent } from './pages/ong/ong-dashboard/ong-dashboard.component';
+import { OngGuard } from './service/ong.guard';
 
 const routes: Routes = [
   {
@@ -104,13 +106,23 @@ const routes: Routes = [
     ],
   },
   {
-    path: 'list-recompensa',
-    component: ListRecompensaComponent,
-    pathMatch: 'full',
+    path: 'ong',
+    component: OngDashboardComponent,
+    canActivate: [OngGuard],
+    children: [
+      {
+        path: 'validacion-ong',
+        component: PanelValidacionOngComponent,
+      },
+      {
+        path: 'perfil',
+        component: PerfilComponent,
+      },
+    ],
   },
   {
-    path: 'validacion-ong',
-    component: PanelValidacionOngComponent,
+    path: 'list-recompensa',
+    component: ListRecompensaComponent,
     pathMatch: 'full',
   },
 ];
