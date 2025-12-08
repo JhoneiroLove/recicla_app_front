@@ -19,13 +19,13 @@ export interface ActividadPropuesta {
 }
 
 export interface AprobarRequest {
-  walletAddress: string;
-  privateKey: string;
+  validadorWallet: string;
+  validadorPrivateKey: string;
 }
 
 export interface RechazarRequest {
-  walletAddress: string;
-  privateKey: string;
+  validadorWallet: string;
+  validadorPrivateKey: string;
   razon: string;
 }
 

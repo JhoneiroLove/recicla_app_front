@@ -62,6 +62,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { PanelValidacionOngComponent } from './pages/panel-validacion-ong/panel-validacion-ong.component';
 import { OngDashboardComponent } from './pages/ong/ong-dashboard/ong-dashboard.component';
 import { SlidebarOngComponent } from './components/slidebar-ong/slidebar-ong.component';
+import { CentroDashboardComponent } from './pages/centro/centro-dashboard/centro-dashboard.component';
+import { SlidebarCentroComponent } from './components/slidebar-centro/slidebar-centro.component';
+import { RegistrarActividadCentroComponent } from './pages/centro/registrar-actividad-centro/registrar-actividad-centro.component';
 
 @NgModule({
   declarations: [
@@ -92,6 +95,9 @@ import { SlidebarOngComponent } from './components/slidebar-ong/slidebar-ong.com
     PanelValidacionOngComponent,
     OngDashboardComponent,
     SlidebarOngComponent,
+    CentroDashboardComponent,
+    SlidebarCentroComponent,
+    RegistrarActividadCentroComponent,
   ],
   imports: [
     BrowserModule,

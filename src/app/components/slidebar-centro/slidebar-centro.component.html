@@ -1,0 +1,25 @@
+<mat-nav-list>
+  <div class="logo-section">
+    <h2>🏢 Centro de Acopio</h2>
+    <p>UPAO</p>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <a mat-list-item routerLink="/centro/registrar-actividad" routerLinkActive="active">
+    <mat-icon>add_circle</mat-icon>
+    <span>Registrar Actividad</span>
+  </a>
+
+  <a mat-list-item routerLink="/centro/historial" routerLinkActive="active">
+    <mat-icon>history</mat-icon>
+    <span>Historial</span>
+  </a>
+
+  <mat-divider></mat-divider>
+
+  <a mat-list-item (click)="logout()">
+    <mat-icon>exit_to_app</mat-icon>
+    <span>Cerrar Sesión</span>
+  </a>
+</mat-nav-list>

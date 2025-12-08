@@ -4,17 +4,21 @@ import { Observable } from 'rxjs';
 import baserUrl from './helper';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-
 export class ReActividadService {
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient) {}
 
   public registrarActividad(formData: FormData): Observable<any> {
-    return this.httpClient.post(`${baserUrl}/actividad/registro`, formData)
+    return this.httpClient.post(`${baserUrl}/actividad/registro`, formData);
   }
 
-  
+  public registrarActividadCentro(formData: FormData): Observable<any> {
+    return this.httpClient.post(
+      `${baserUrl}/actividad/registro-centro`,
+      formData
+    );
+  }
 
   public obtenerHistorialPorUsuario(): Observable<any> {
     return this.httpClient.get(`${baserUrl}/actividad/historial`);
@@ -26,7 +30,8 @@ export class ReActividadService {
 
   // En tu servicio ReActividadService
   obtenerQR(idActividad: number): Observable<Blob> {
-    return this.httpClient.get(`${baserUrl}/actividad/qr/${idActividad}`, { responseType: 'blob' });
+    return this.httpClient.get(`${baserUrl}/actividad/qr/${idActividad}`, {
+      responseType: 'blob',
+    });
   }
-
 }

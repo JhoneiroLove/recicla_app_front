@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    // ROLES PARTICIPANTE - ADMINISTRADOR - ONG
+    // ROLES PARTICIPANTE - ADMINISTRADOR - ONG - CENTRO_ACOPIO
     this.loginService.generateToken(this.loginData).subscribe(
       (data: any) => {
         this.loginService.loginUser(data.token);
@@ -55,6 +55,8 @@ export class LoginComponent implements OnInit {
           this.router.navigate(['/user/ver-historial']);
         } else if (userRole === 'ONG') {
           this.router.navigate(['/ong/validacion-ong']);
+        } else if (userRole === 'CENTRO_ACOPIO') {
+          this.router.navigate(['/centro/registrar-actividad']);
         } else {
           this.router.navigate(['/']);
         }

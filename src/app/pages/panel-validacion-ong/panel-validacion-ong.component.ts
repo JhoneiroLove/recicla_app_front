@@ -130,8 +130,8 @@ export class PanelValidacionOngComponent implements OnInit {
     });
 
     const request = {
-      walletAddress: this.walletAddress,
-      privateKey: this.privateKey,
+      validadorWallet: this.walletAddress,
+      validadorPrivateKey: this.privateKey,
     };
 
     this.blockchainService
@@ -166,8 +166,8 @@ export class PanelValidacionOngComponent implements OnInit {
     });
 
     const request = {
-      walletAddress: this.walletAddress,
-      privateKey: this.privateKey,
+      validadorWallet: this.walletAddress,
+      validadorPrivateKey: this.privateKey,
       razon: this.razonRechazo,
     };
 

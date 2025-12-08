@@ -22,6 +22,9 @@ import { PerfilComponent } from './pages/perfil/perfil.component';
 import { PanelValidacionOngComponent } from './pages/panel-validacion-ong/panel-validacion-ong.component';
 import { OngDashboardComponent } from './pages/ong/ong-dashboard/ong-dashboard.component';
 import { OngGuard } from './service/ong.guard';
+import { CentroDashboardComponent } from './pages/centro/centro-dashboard/centro-dashboard.component';
+import { CentroAcopioGuard } from './service/centro-acopio.guard';
+import { RegistrarActividadCentroComponent } from './pages/centro/registrar-actividad-centro/registrar-actividad-centro.component';
 
 const routes: Routes = [
   {
@@ -113,6 +116,25 @@ const routes: Routes = [
       {
         path: 'validacion-ong',
         component: PanelValidacionOngComponent,
+      },
+      {
+        path: 'perfil',
+        component: PerfilComponent,
+      },
+    ],
+  },
+  {
+    path: 'centro',
+    component: CentroDashboardComponent,
+    canActivate: [CentroAcopioGuard],
+    children: [
+      {
+        path: 'registrar-actividad',
+        component: RegistrarActividadCentroComponent,
+      },
+      {
+        path: 'historial',
+        component: VHistorialComponent,
       },
       {
         path: 'perfil',

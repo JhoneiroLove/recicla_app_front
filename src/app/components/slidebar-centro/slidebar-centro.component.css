@@ -1,0 +1,53 @@
+.logo-section {
+  padding: 20px;
+  text-align: center;
+  background-color: #34495e;
+}
+
+.logo-section h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #27ae60;
+}
+
+.logo-section p {
+  margin: 5px 0 0 0;
+  font-size: 14px;
+  color: #bdc3c7;
+}
+
+mat-nav-list {
+  padding-top: 0;
+}
+
+a[mat-list-item] {
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+a[mat-list-item]:hover {
+  background-color: #34495e;
+}
+
+a[mat-list-item].active {
+  background-color: #27ae60;
+  border-left: 4px solid #2ecc71;
+}
+
+a[mat-list-item] mat-icon {
+  margin-right: 15px;
+  color: #ecf0f1;
+}
+
+a[mat-list-item] span {
+  font-size: 16px;
+}
+
+mat-divider {
+  background-color: #34495e;
+  margin: 10px 0;
+}
