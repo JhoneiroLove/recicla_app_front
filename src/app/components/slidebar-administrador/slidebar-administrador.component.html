@@ -1,25 +1,60 @@
-<div class="sidebar">
-  <mat-action-list>
-    <div class="sidebar-title">Menú</div>
+<div class="sidebar-container bg-white dark:bg-[#1e293b] shadow-lg h-screen px-2 py-3 overflow-y-auto transition-all duration-300 flex flex-col fixed left-0 top-0"
+     [ngClass]="isExpanded ? 'w-[220px] expanded' : 'w-[60px]'">
 
-    <button routerLink="/validacion-ong">
-      <i class="fa-solid fa-check-circle"></i> Validar Actividades
+  <!-- Toggle Button -->
+  <div class="sidebar-item mb-2">
+    <button (click)="toggleSidebar()" class="text-gray-600 dark:text-gray-300 hover:text-[#096754] dark:hover:text-[#0a7a5e] transition-colors p-0 border-none bg-transparent cursor-pointer">
+      <i class="fa-solid fa-bars text-xl"></i>
+    </button>
+  </div>
+
+  <!-- Divider -->
+  <div class="border-t border-gray-200 dark:border-gray-600 my-2"></div>
+
+  <!-- Title -->
+  <div class="sidebar-item mb-2">
+    <i class="fa-solid fa-user-shield"></i>
+    <span class="sidebar-text">Administrador</span>
+  </div>
+
+  <!-- Divider -->
+  <div class="border-t border-gray-200 dark:border-gray-600 my-2"></div>
+
+  <nav class="flex flex-col gap-1 flex-grow">
+    <button
+      routerLink="/admin/ver-recompensa"
+      routerLinkActive="sidebar-active"
+      class="sidebar-item sidebar-button">
+      <i class="fa-solid fa-gift"></i>
+      <span class="sidebar-text">Gestionar Recompensas</span>
     </button>
 
-    <button routerLink="/admin/registrar-recompensa">
-      <i class="fa-solid fa-gift"></i> Agregar Recompensa
+    <button
+      routerLink="/admin/ver-residuo"
+      routerLinkActive="sidebar-active"
+      class="sidebar-item sidebar-button">
+      <i class="fa-solid fa-recycle"></i>
+      <span class="sidebar-text">Gestionar Residuos</span>
     </button>
+  </nav>
 
-    <button routerLink="/admin/registrar-residuo">
-      <i class="fa-solid fa-trash"></i> Registrar Residuo
-    </button>
+  <!-- Bottom Icons -->
+  <div class="mt-auto flex flex-col gap-1">
+    <!-- User -->
+    <div class="sidebar-item">
+      <i class="fa-solid fa-user-circle"></i>
+      <span class="sidebar-text text-sm">{{ userName }}</span>
+    </div>
 
-    <button routerLink="/admin/ver-recompensa">
-      <i class="fa-solid fa-eye"></i> Ver Recompensa
-    </button>
+    <!-- Divider -->
+    <div class="border-t border-gray-200 dark:border-gray-600 my-2"></div>
 
-    <button routerLink="/admin/ver-residuo">
-      <i class="fa-regular fa-eye"></i> Ver Residuo
+    <!-- Logout -->
+    <button
+      (click)="logout()"
+      class="sidebar-item sidebar-button text-red-500 hover:text-red-600">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      <span class="sidebar-text">Cerrar sesión</span>
     </button>
-  </mat-action-list>
+  </div>
 </div>

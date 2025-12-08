@@ -1,38 +1,289 @@
-<div class="bootstrap-wrapper">
-  <div class="container">
-    <h2 class="text-center">Recompensas Disponibles Para Canjear</h2>
+<div class="min-h-screen bg-gray-50 dark:bg-[#1a1f2e] pr-6 py-6 transition-all duration-300"
+     [ngClass]="(sidebarExpanded$ | async) ? 'pl-[235px]' : 'pl-[75px]'">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center gap-3">
+        <div class="bg-gradient-to-r from-[#096754] to-[#0a7a5e] p-3 rounded-lg shadow-lg">
+          <i class="fa-solid fa-gift text-white text-2xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Catálogo de Recompensas</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Canjea tus puntos REC por increíbles premios</p>
+        </div>
+      </div>
+      <button *ngIf="!esParticipante" (click)="abrirModalRegistro()"
+              class="flex items-center gap-2 bg-[#096754] hover:bg-[#0a7a5e] text-white px-5 py-2.5 rounded-lg transition-colors duration-200 text-sm shadow-lg hover:shadow-xl">
+        <i class="fa-solid fa-plus"></i>
+        Nueva Recompensa
+      </button>
+    </div>
 
     <!-- Mensaje cuando no hay recompensas disponibles -->
-    <div *ngIf="recompensas.length === 0" class="text-center no-recompensas">
-      <p>Todavía no hay recompensas generadas. ¡Pronto habrán nuevas recompensas!</p>
-      <img src="/assets/recom.png" alt="No hay recompensas" class="imagen-sin-recompensas">
+    <div *ngIf="recompensas.length === 0" class="flex flex-col items-center justify-center py-16">
+      <img src="/assets/recom.png" alt="No hay recompensas" class="w-64 h-64 object-contain mb-6 opacity-50">
+      <p class="text-gray-500 dark:text-gray-400 text-lg">Todavía no hay recompensas generadas. ¡Pronto habrán nuevas recompensas!</p>
     </div>
 
     <!-- Lista de recompensas si existen -->
-    <div class="recompensas-container" *ngIf="recompensas.length > 0">
-      <mat-card *ngFor="let recompensa of recompensas" class="recompensa-card">
-        <img mat-card-image *ngIf="recompensa.imagenPath" [src]="'data:image/jpeg;base64,' + recompensa.imagenPath"
-             alt="Imagen de Recompensa">
-
-        <mat-card-content>
-          <h2>{{ recompensa.titulo }}</h2>
-          <p>{{ recompensa.descripcion }}</p>
-          <div class="juntos">
-            <p><span class="bold">Categoría:</span> {{ recompensa.categoria }}</p>
-            <p><span class="bold">Valor:</span> {{ recompensa.valor }}</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" *ngIf="recompensas.length > 0">
+      <div *ngFor="let recompensa of recompensas" class="bg-white dark:bg-[#252d3d] rounded-lg shadow hover:shadow-lg overflow-hidden transition-all duration-200 border border-transparent hover:border-[#096754]">
+        <!-- Imagen con overlay de categoría -->
+        <div class="relative w-full h-44 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 overflow-hidden group">
+          <img *ngIf="recompensa.imagenPath" [src]="'data:image/jpeg;base64,' + recompensa.imagenPath"
+               alt="Imagen de Recompensa" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+          <div class="absolute top-3 left-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-700 dark:text-gray-300">
+            <i class="fa-solid fa-tag mr-1"></i>{{ recompensa.categoria }}
           </div>
-        </mat-card-content>
+          <div class="absolute top-3 right-3 bg-[#096754] text-white px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1 shadow-lg">
+            <i class="fa-solid fa-coins"></i>
+            <span>{{ recompensa.valor }}</span>
+          </div>
+        </div>
 
-        <div class="container-box text-center">
-          <button type="submit" mat-raised-button *ngIf="esParticipante" (click)="canjearRecompensa(recompensa.titulo)">Canjear</button>
-          <button type="submit" mat-raised-button *ngIf="!esParticipante" (click)="editarRecompensa(recompensa)">
-            <i class="fa-solid fa-pen-to-square"></i>
+        <!-- Contenido -->
+        <div class="p-4">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2 line-clamp-1">{{ recompensa.titulo }}</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">{{ recompensa.descripcion }}</p>
+
+          <!-- Fechas -->
+          <div class="mb-4 space-y-1.5">
+            <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <i class="fa-solid fa-calendar-plus w-4"></i>
+              <span>Inicio: {{ recompensa.fechaInicio | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <i class="fa-solid fa-calendar-xmark w-4"></i>
+              <span>Cierre: {{ recompensa.fechaCierre | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="flex gap-2">
+            <button *ngIf="esParticipante" (click)="canjearRecompensa(recompensa.titulo)"
+                    class="flex-1 bg-[#096754] hover:bg-[#0a7a5e] text-white py-2.5 rounded-lg transition-colors duration-200 text-sm font-medium flex items-center justify-center gap-2">
+              <i class="fa-solid fa-gift"></i>
+              Canjear
+            </button>
+            <button *ngIf="!esParticipante" (click)="editarRecompensa(recompensa)"
+                    class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm font-medium">
+              <i class="fa-solid fa-pen-to-square"></i>
+              Editar
+            </button>
+            <button *ngIf="!esParticipante" (click)="confirmarEliminacion(recompensa.id)"
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg transition-colors duration-200 text-sm">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div *ngIf="recompensas.length > 0" class="mt-8 flex items-center justify-between bg-white dark:bg-[#252d3d] px-6 py-4 rounded-lg shadow">
+      <div class="text-sm text-gray-600 dark:text-gray-400">
+        Mostrando {{ (currentPage * pageSize) + 1 }} - {{ Math.min((currentPage + 1) * pageSize, totalElements) }} de {{ totalElements }} recompensas
+      </div>
+      <div class="flex items-center gap-2">
+        <button (click)="cambiarPagina(currentPage - 1)" [disabled]="currentPage === 0"
+                class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <span class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          Página {{ currentPage + 1 }} de {{ totalPages }}
+        </span>
+        <button (click)="cambiarPagina(currentPage + 1)" [disabled]="currentPage >= totalPages - 1"
+                class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Edición de Recompensa -->
+<div *ngIf="mostrarModalEdicion" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" (click)="cerrarModalEdicion()">
+  <div class="bg-white dark:bg-[#252d3d] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" (click)="$event.stopPropagation()">
+    <!-- Header del modal -->
+    <div class="sticky top-0 bg-white dark:bg-[#252d3d] border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Editar Recompensa</h2>
+      <button (click)="cerrarModalEdicion()" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Body del modal -->
+    <div class="p-6">
+      <form [formGroup]="editarRecompensaForm" (ngSubmit)="onSubmitEditar()" class="space-y-4">
+        <!-- Título -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Título</label>
+          <input type="text" formControlName="titulo" placeholder="Ingrese el título"
+                 class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+          <p *ngIf="editarRecompensaForm.get('titulo')!.invalid && editarRecompensaForm.get('titulo')!.touched"
+             class="mt-1 text-sm text-red-500">
+            El título debe tener máximo 40 caracteres y no puede contener números.
+          </p>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descripción</label>
+          <textarea formControlName="descripcion" placeholder="Ingrese la descripción" rows="3"
+                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors resize-none"></textarea>
+          <p *ngIf="editarRecompensaForm.get('descripcion')!.invalid && editarRecompensaForm.get('descripcion')!.touched"
+             class="mt-1 text-sm text-red-500">
+            La descripción debe tener máximo 30 caracteres y no puede contener números.
+          </p>
+        </div>
+
+        <!-- Categoría y Valor -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoría</label>
+            <input formControlName="categoria" placeholder="Ingrese la categoría"
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+            <p *ngIf="editarRecompensaForm.get('categoria')!.invalid && editarRecompensaForm.get('categoria')!.touched"
+               class="mt-1 text-sm text-red-500">
+              La categoría debe tener máximo 12 caracteres.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Valor en Puntos</label>
+            <input type="number" formControlName="valor" placeholder="0"
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+            <p *ngIf="editarRecompensaForm.get('valor')!.invalid && editarRecompensaForm.get('valor')!.touched"
+               class="mt-1 text-sm text-red-500">
+              El valor debe ser mayor que 0.
+            </p>
+          </div>
+        </div>
+
+        <!-- Imagen actual -->
+        <div *ngIf="recompensaActual?.imagenPath">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Imagen actual</label>
+          <div class="relative rounded-lg overflow-hidden">
+            <img [src]="'data:image/jpeg;base64,' + recompensaActual!.imagenPath" alt="Imagen actual" class="w-full h-48 object-cover">
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex gap-3 pt-4">
+          <button type="button" (click)="cerrarModalEdicion()"
+                  class="flex-1 px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium">
+            <i class="fa-solid fa-xmark mr-2 text-xs"></i>
+            Cancelar
           </button>
-          <button type="reset" mat-raised-button *ngIf="!esParticipante" (click)="confirmarEliminacion(recompensa.id)">
-            <i class="fa-solid fa-trash"></i>
+          <button type="submit" [disabled]="!editarRecompensaForm.valid"
+                  class="flex-1 px-5 py-2.5 bg-[#096754] hover:bg-[#0a7a5e] text-white rounded-lg transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-save mr-2 text-xs"></i>
+            Guardar Cambios
           </button>
         </div>
-      </mat-card>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Registro de Recompensa -->
+<div *ngIf="mostrarModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" (click)="cerrarModal()">
+  <div class="bg-white dark:bg-[#252d3d] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" (click)="$event.stopPropagation()">
+    <!-- Header del modal -->
+    <div class="sticky top-0 bg-white dark:bg-[#252d3d] border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+      <h2 class="text-xl font-medium text-gray-800 dark:text-white">Registrar Nueva Recompensa</h2>
+      <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Body del modal -->
+    <div class="p-6">
+      <form [formGroup]="recompensaForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <!-- Título -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Título</label>
+          <input type="text" formControlName="titulo" placeholder="Ingrese el título"
+                 class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+          <p *ngIf="recompensaForm.get('titulo')!.invalid && recompensaForm.get('titulo')!.touched"
+             class="mt-1 text-sm text-red-500">
+            El título debe tener máximo 40 caracteres y no puede contener números.
+          </p>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descripción</label>
+          <textarea formControlName="descripcion" placeholder="Ingrese la descripción" rows="3"
+                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors resize-none"></textarea>
+          <p *ngIf="recompensaForm.get('descripcion')!.invalid && recompensaForm.get('descripcion')!.touched"
+             class="mt-1 text-sm text-red-500">
+            La descripción debe tener máximo 30 caracteres y no puede contener números.
+          </p>
+        </div>
+
+        <!-- Categoría y Valor -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoría</label>
+            <input formControlName="categoria" placeholder="Ingrese la categoría"
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+            <p *ngIf="recompensaForm.get('categoria')!.invalid && recompensaForm.get('categoria')!.touched"
+               class="mt-1 text-sm text-red-500">
+              La categoría debe tener máximo 12 caracteres.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Valor en Puntos</label>
+            <input type="number" formControlName="valor" placeholder="0"
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+            <p *ngIf="recompensaForm.get('valor')!.invalid && recompensaForm.get('valor')!.touched"
+               class="mt-1 text-sm text-red-500">
+              El valor debe ser mayor que 0.
+            </p>
+          </div>
+        </div>
+
+        <!-- Subir imagen -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Imagen de la recompensa</label>
+          <input type="file" (change)="onFileSelected($event)" #fileInput class="hidden">
+
+          <div *ngIf="!imagenArchivo"
+               (click)="fileInput.click()"
+               class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-[#096754] dark:hover:border-[#0a7a5e] transition-colors">
+            <i class="fa-solid fa-cloud-arrow-up text-4xl text-gray-400 mb-3"></i>
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-1">Haz clic para seleccionar una imagen</p>
+            <p class="text-xs text-gray-500 dark:text-gray-500">PNG, JPG hasta 5MB</p>
+            <p *ngIf="!imagenArchivo && imageTouched" class="mt-2 text-sm text-red-500">
+              Debes subir una imagen.
+            </p>
+          </div>
+
+          <div *ngIf="imagenArchivo" class="relative rounded-lg overflow-hidden">
+            <img [src]="imagenPreview" alt="Vista previa" class="w-full h-64 object-cover">
+            <button (click)="removeImage()" type="button"
+                    class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center transition-colors">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex gap-3 pt-4">
+          <button type="button" (click)="onReset()"
+                  class="flex-1 px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm">
+            <i class="fa-solid fa-rotate-right mr-2 text-xs"></i>
+            Limpiar
+          </button>
+          <button type="submit" [disabled]="!recompensaForm.valid || !imagenArchivo"
+                  class="flex-1 px-5 py-2.5 bg-[#096754] hover:bg-[#0a7a5e] text-white rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-save mr-2 text-xs"></i>
+            Registrar
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

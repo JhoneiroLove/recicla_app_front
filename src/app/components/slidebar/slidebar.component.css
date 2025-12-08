@@ -1,69 +1,62 @@
-.sidebar {
-    height: 70vh; /* Full height of the viewport */
-    max-height: auto;
-    max-width:  250px; /* Sidebar width */
-    margin-top: 16px;
-    margin-bottom: 16px;
-    border-radius: 5px;
-    left: 0;
-    top: 0;
-    background-color: #ffffffda; /* Dark grey background */
-    padding-top: 20px; /* Spacing from the top */
-    box-shadow: 0px 0 10px rgba(0,0,0,0.1); /* Shadow on the right side */
-    overflow-y: auto;
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: #096754;
+  border-radius: 8px;
+  transition: all 0.3s;
+  font-size: 15px;
 }
 
-.sidebar a {
-    padding: 10px 15px;
-    text-decoration: none;
-    font-size: 16px;
-    color: white;
-    display: block;
-    transition: color 0.3s;
+.dark .sidebar-item {
+  color: white;
 }
 
-.sidebar a:hover {
-    color: #ffffff; /* Light grey on hover */
-    background-color: #096754;
+.sidebar-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
 }
 
-/* Estilo adicional para los botones dentro del sidebar */
-.sidebar button {
-    display: flex; /* Establece los botones como contenedores flexibles */
-    align-items: center; /* Alinea verticalmente los ítems al centro */
-    width: 100%; /* Asegura que los botones ocupen todo el ancho disponible */
-    background: none; /* Elimina cualquier fondo predeterminado */
-    border: none; /* Elimina cualquier borde predeterminado */
-    color: #096754; /* Establece el color del texto (ajustar según sea necesario) */
-    font-size: 16px; /* Tamaño de la fuente del texto */
-    padding: 10px 15px; /* Ajusta el padding según sea necesario */
-    text-align: left; /* Alinea el texto a la izquierda */
+.sidebar-button:hover {
+  background-color: #e8f5f1;
 }
 
-.mat-icon {
-    margin-right: 10px; /* Añade espacio entre el icono y el texto */
+.dark .sidebar-button:hover {
+  background-color: rgba(10, 122, 94, 0.2);
 }
 
-.sidebar a, .sidebar button {
-    text-decoration: none; /* Elimina la subrayado de los enlaces */
-    display: block; /* Hace que cada enlace/botón sea un bloque para mejorar la manejabilidad */
-    transition: color 0.3s; /* Transición suave para los cambios de color */
+.sidebar-item i {
+  min-width: 20px;
+  text-align: center;
+  font-size: 20px;
 }
 
-.sidebar a:hover, .sidebar button:hover {
-    color: #179CBB; /* Cambia el color al pasar el mouse */
-}
-.sidebar-title{
-    color: #096754;
-    margin-left: 15px;
-    font-size: 20px;
-    margin-bottom: 17px;
-
+.sidebar-text {
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.3s;
+  overflow: hidden;
 }
 
-span{
-    margin-bottom: 50px;
+.sidebar-container.expanded .sidebar-text {
+  opacity: 1;
 }
-i{
-    margin-right: 15px;
+
+.sidebar-active {
+  background-color: #096754 !important;
+  color: white !important;
+}
+
+.dark .sidebar-active {
+  background-color: #0a7a5e !important;
+}
+
+.sidebar-active i,
+.sidebar-active span {
+  color: white !important;
 }

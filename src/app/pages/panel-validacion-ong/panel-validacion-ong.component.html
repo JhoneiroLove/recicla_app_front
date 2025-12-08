@@ -1,153 +1,277 @@
-<div class="container-panel">
-  <div class="header">
-    <h1>🌿 Panel de Validación ONG</h1>
-    <p class="subtitle">Revisa y aprueba actividades de reciclaje con evidencia en blockchain</p>
-    <button class="btn-refresh" (click)="cargarPropuestas()" [disabled]="cargando">
-      <span *ngIf="!cargando">🔄 Actualizar</span>
-      <span *ngIf="cargando">⏳ Cargando...</span>
-    </button>
-  </div>
-
-  <!-- Indicador de carga -->
-  <div *ngIf="cargando" class="loading">
-    <div class="spinner"></div>
-    <p>Cargando propuestas pendientes...</p>
-  </div>
-
-  <!-- Lista vacía -->
-  <div *ngIf="!cargando && propuestasPendientes.length === 0" class="empty-state">
-    <div class="empty-icon">✅</div>
-    <h3>No hay propuestas pendientes</h3>
-    <p>Todas las actividades han sido procesadas</p>
-  </div>
-
-  <!-- Lista de propuestas -->
-  <div *ngIf="!cargando && propuestasPendientes.length > 0" class="propuestas-grid">
-    <div *ngFor="let propuesta of propuestasPendientes" class="propuesta-card">
-
-      <!-- Header de la tarjeta -->
-      <div class="card-header">
-        <span class="badge-id">Actividad #{{propuesta.actividadId}}</span>
-        <span class="badge-aprobaciones">{{propuesta.aprobaciones}}/2 Aprobaciones</span>
+<div class="min-h-screen pr-6 py-6 transition-all duration-300"
+     [ngClass]="(sidebarExpanded$ | async) ? 'pl-[235px]' : 'pl-[75px]'">
+  <div class="px-6">
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-6">
+      <div class="bg-gradient-to-r from-[#096754] to-[#0a7a5e] p-3 rounded-lg shadow-lg">
+        <i class="fa-solid fa-clipboard-check text-white text-2xl"></i>
       </div>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Panel de Validación ONG</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Revisa y aprueba actividades de reciclaje con evidencia en blockchain</p>
+      </div>
+    </div>
 
-      <!-- Evidencia IPFS -->
-      <div class="evidencia-container" *ngIf="isValidIPFS(propuesta.evidenciaIPFS)">
-        <img [src]="getIPFSUrl(propuesta.evidenciaIPFS)" alt="Evidencia IPFS" class="evidencia-img"
-          (click)="verEvidenciaCompleta(propuesta.evidenciaIPFS)" />
-        <div class="ipfs-overlay">
-          <span class="ipfs-hash">📎 {{propuesta.evidenciaIPFS.substring(0, 15)}}...</span>
-          <button class="btn-ver-completa" (click)="verEvidenciaCompleta(propuesta.evidenciaIPFS)">
-            🔍 Ver completa
-          </button>
+    <!-- Indicador de carga -->
+    <div *ngIf="cargando" class="flex flex-col items-center justify-center py-16">
+      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-[#096754] mb-4"></div>
+      <p class="text-gray-600 dark:text-gray-400">Cargando propuestas pendientes...</p>
+    </div>
+
+    <!-- Lista vacía -->
+    <div *ngIf="! cargando && propuestasPendientes.length === 0" class="flex flex-col items-center justify-center py-20">
+      <div class="relative mb-8">
+        <div class="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/30 rounded-full flex items-center justify-center shadow-lg">
+          <i class="fa-solid fa-check-double text-6xl text-green-600 dark:text-green-400"></i>
+        </div>
+        <div class="absolute -top-2 -right-2 w-12 h-12 bg-[#096754] rounded-full flex items-center justify-center shadow-lg">
+          <i class="fa-solid fa-sparkles text-white text-xl"></i>
         </div>
       </div>
+      <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">¡Todo al día!</h3>
+      <p class="text-gray-600 dark:text-gray-400 text-center max-w-md">
+        No hay actividades pendientes de validación en este momento.
+        <br>
+        <span class="text-sm text-gray-500 dark:text-gray-500 mt-2 inline-block">Las nuevas propuestas aparecerán aquí automáticamente</span>
+      </p>
+    </div>
 
-      <div class="evidencia-placeholder" *ngIf="!isValidIPFS(propuesta.evidenciaIPFS)">
-        <span>⚠️ Evidencia no disponible</span>
+    <!-- Lista de propuestas -->
+    <div *ngIf="! cargando && propuestasPendientes.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div *ngFor="let propuesta of propuestasPaginadas" class="bg-white dark:bg-[#252d3d] rounded-lg shadow hover:shadow-lg overflow-hidden transition-all duration-200 border border-transparent hover:border-[#096754]">
+
+        <!-- Header con badges -->
+        <div class="relative w-full h-44 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 overflow-hidden group cursor-pointer"
+             *ngIf="isValidIPFS(propuesta.evidenciaIPFS)"
+             (click)="verEvidenciaCompleta(propuesta.evidenciaIPFS)">
+          <img [src]="getIPFSUrl(propuesta.evidenciaIPFS)" alt="Evidencia IPFS"
+               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+          <div class="absolute top-3 left-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-700 dark:text-gray-300">
+            <i class="fa-solid fa-hashtag mr-1"></i>Actividad {{propuesta.actividadId}}
+          </div>
+          <div class="absolute top-3 right-3 bg-[#096754] text-white px-2. 5 py-1 rounded-full text-xs font-medium flex items-center gap-1 shadow-lg">
+            <i class="fa-solid fa-check-double"></i>
+            <span>{{propuesta.aprobaciones}}/2</span>
+          </div>
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+            <p class="text-white text-xs truncate">
+              <i class="fa-solid fa-link mr-1"></i>{{propuesta.evidenciaIPFS. substring(0, 20)}}...
+            </p>
+          </div>
+        </div>
+
+        <!-- Placeholder si no hay evidencia -->
+        <div *ngIf="!isValidIPFS(propuesta.evidenciaIPFS)"
+             class="relative w-full h-44 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+          <div class="text-center">
+            <i class="fa-solid fa-image-slash text-4xl text-gray-400 dark:text-gray-600 mb-2"></i>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Sin evidencia</p>
+          </div>
+          <div class="absolute top-3 left-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-700 dark:text-gray-300">
+            <i class="fa-solid fa-hashtag mr-1"></i>Actividad {{propuesta.actividadId}}
+          </div>
+          <div class="absolute top-3 right-3 bg-[#096754] text-white px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1 shadow-lg">
+            <i class="fa-solid fa-check-double"></i>
+            <span>{{propuesta.aprobaciones}}/2</span>
+          </div>
+        </div>
+
+        <!-- Contenido de la tarjeta -->
+        <div class="p-4">
+          <!-- Información del usuario -->
+          <div class="mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-2">
+              <i class="fa-solid fa-wallet"></i>
+              <span class="font-mono truncate">{{propuesta.usuarioWallet. substring(0, 10)}}... {{propuesta.usuarioWallet. substring(38)}}</span>
+            </div>
+          </div>
+
+          <!-- Detalles de la actividad -->
+          <div class="space-y-2 mb-4">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <i class="fa-solid fa-recycle"></i>Material
+              </span>
+              <span class="font-medium text-gray-800 dark:text-white bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                {{getNombreMaterial(propuesta.tipoMaterial)}}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <i class="fa-solid fa-weight-hanging"></i>Peso
+              </span>
+              <span class="font-medium text-gray-800 dark:text-white">{{propuesta.pesoKg}} kg</span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded">
+              <span class="text-green-700 dark:text-green-400 flex items-center gap-2">
+                <i class="fa-solid fa-coins"></i>Tokens
+              </span>
+              <span class="font-bold text-green-700 dark:text-green-400">{{propuesta.tokensCalculados}} REC</span>
+            </div>
+          </div>
+
+          <!-- Info blockchain (si existe) -->
+          <div *ngIf="propuesta.transactionHash" class="mb-4 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs">
+            <div class="flex items-center gap-2 text-blue-700 dark:text-blue-400 mb-1">
+              <i class="fa-solid fa-cube"></i>
+              <span class="font-mono truncate">TX: {{propuesta.transactionHash.substring(0, 20)}}... </span>
+            </div>
+            <div class="flex items-center gap-2 text-blue-700 dark:text-blue-400">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>Bloque #{{propuesta.blockNumber}}</span>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="flex gap-2">
+            <button (click)="abrirFormularioAprobar(propuesta)"
+                    class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2. 5 rounded-lg transition-colors duration-200 text-sm font-medium flex items-center justify-center gap-2">
+              <i class="fa-solid fa-check"></i>
+              Aprobar
+            </button>
+            <button (click)="abrirFormularioRechazar(propuesta)"
+                    class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-lg transition-colors duration-200 text-sm font-medium flex items-center justify-center gap-2">
+              <i class="fa-solid fa-times"></i>
+              Rechazar
+            </button>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <!-- Información de la actividad -->
-      <div class="info-section">
-        <div class="info-row">
-          <span class="label">👤 Usuario:</span>
-          <span class="value">{{propuesta.usuarioWallet.substring(0,
-            10)}}...{{propuesta.usuarioWallet.substring(38)}}</span>
-        </div>
-
-        <div class="info-row">
-          <span class="label">♻️ Material:</span>
-          <span class="value material-badge">{{getNombreMaterial(propuesta.tipoMaterial)}}</span>
-        </div>
-
-        <div class="info-row">
-          <span class="label">⚖️ Peso:</span>
-          <span class="value">{{propuesta.pesoKg}} kg</span>
-        </div>
-
-        <div class="info-row highlight">
-          <span class="label">🪙 Tokens calculados:</span>
-          <span class="value tokens">{{propuesta.tokensCalculados}} REC</span>
-        </div>
+    <!-- Paginación -->
+    <div *ngIf="!cargando && propuestasPendientes.length > 0" class="mt-8 flex items-center justify-between bg-white dark:bg-[#252d3d] px-6 py-4 rounded-lg shadow">
+      <div class="text-sm text-gray-600 dark:text-gray-400">
+        Mostrando {{ (currentPage * pageSize) + 1 }} - {{ Math.min((currentPage + 1) * pageSize, propuestasPendientes.length) }} de {{ propuestasPendientes.length }} propuestas
       </div>
-
-      <!-- Información blockchain -->
-      <div class="blockchain-info" *ngIf="propuesta.transactionHash">
-        <div class="info-row-small">
-          <span class="label-small">TX Hash:</span>
-          <span class="value-small">{{propuesta.transactionHash.substring(0, 20)}}...</span>
-        </div>
-        <div class="info-row-small">
-          <span class="label-small">Bloque:</span>
-          <span class="value-small">#{{propuesta.blockNumber}}</span>
-        </div>
-      </div>
-
-      <!-- Botones de acción -->
-      <div class="actions">
-        <button class="btn-aprobar" (click)="abrirFormularioAprobar(propuesta)">
-          ✅ Aprobar
+      <div class="flex items-center gap-2">
+        <button (click)="cambiarPagina(currentPage - 1)" [disabled]="currentPage === 0"
+                class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          <i class="fa-solid fa-chevron-left"></i>
         </button>
-        <button class="btn-rechazar" (click)="abrirFormularioRechazar(propuesta)">
-          ❌ Rechazar
+        <span class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          Página {{ currentPage + 1 }} de {{ totalPages }}
+        </span>
+        <button (click)="cambiarPagina(currentPage + 1)" [disabled]="currentPage >= totalPages - 1"
+                class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          <i class="fa-solid fa-chevron-right"></i>
         </button>
       </div>
-
     </div>
   </div>
+</div>
 
-  <!-- Modal de formulario -->
-  <div class="modal-overlay" *ngIf="mostrarFormulario" (click)="cerrarFormulario()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
+<!-- Modal de formulario (sin cambios) -->
+<div *ngIf="mostrarFormulario" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" (click)="cerrarFormulario()">
+  <div class="bg-white dark:bg-[#252d3d] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" (click)="$event.stopPropagation()">
 
-      <div class="modal-header">
-        <h2 *ngIf="accionSeleccionada === 'aprobar'">✅ Aprobar Actividad #{{actividadSeleccionada?.actividadId}}</h2>
-        <h2 *ngIf="accionSeleccionada === 'rechazar'">❌ Rechazar Actividad #{{actividadSeleccionada?.actividadId}}</h2>
-        <button class="btn-close" (click)="cerrarFormulario()">×</button>
+    <!-- Header del modal -->
+    <div class="sticky top-0 bg-white dark:bg-[#252d3d] border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center rounded-t-2xl">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+        <i *ngIf="accionSeleccionada === 'aprobar'" class="fa-solid fa-check-circle text-green-500"></i>
+        <i *ngIf="accionSeleccionada === 'rechazar'" class="fa-solid fa-times-circle text-red-500"></i>
+        <span *ngIf="accionSeleccionada === 'aprobar'">Aprobar Actividad #{{actividadSeleccionada?. actividadId}}</span>
+        <span *ngIf="accionSeleccionada === 'rechazar'">Rechazar Actividad #{{actividadSeleccionada?.actividadId}}</span>
+      </h2>
+      <button (click)="cerrarFormulario()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+        <i class="fa-solid fa-times text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Body del modal -->
+    <div class="p-6 space-y-6">
+
+      <!-- Resumen de la actividad -->
+      <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 space-y-2">
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Resumen de la Actividad</h3>
+
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+            <i class="fa-solid fa-wallet"></i>Usuario
+          </span>
+          <span class="font-mono text-xs text-gray-800 dark:text-white">{{actividadSeleccionada?.usuarioWallet}}</span>
+        </div>
+
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+            <i class="fa-solid fa-recycle"></i>Material
+          </span>
+          <span class="font-medium text-gray-800 dark:text-white">{{getNombreMaterial(actividadSeleccionada?.tipoMaterial || '')}}</span>
+        </div>
+
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+            <i class="fa-solid fa-weight-hanging"></i>Peso
+          </span>
+          <span class="font-medium text-gray-800 dark:text-white">{{actividadSeleccionada?.pesoKg}} kg</span>
+        </div>
+
+        <div class="flex items-center justify-between text-sm bg-green-100 dark:bg-green-900/30 p-2 rounded mt-2">
+          <span class="text-green-700 dark:text-green-400 flex items-center gap-2">
+            <i class="fa-solid fa-coins"></i>Tokens
+          </span>
+          <span class="font-bold text-green-700 dark:text-green-400">{{actividadSeleccionada?.tokensCalculados}} REC</span>
+        </div>
       </div>
 
-      <div class="modal-body">
-
-        <!-- Resumen de la actividad -->
-        <div class="resumen-actividad">
-          <p><strong>Usuario:</strong> {{actividadSeleccionada?.usuarioWallet}}</p>
-          <p><strong>Material:</strong> {{getNombreMaterial(actividadSeleccionada?.tipoMaterial || '')}}</p>
-          <p><strong>Peso:</strong> {{actividadSeleccionada?.pesoKg}} kg</p>
-          <p><strong>Tokens:</strong> {{actividadSeleccionada?.tokensCalculados}} REC</p>
+      <!-- Formulario de validador -->
+      <div class="space-y-4">
+        <div>
+          <label for="wallet" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-key"></i>Wallet del Validador (ONG)
+          </label>
+          <input type="text" id="wallet"
+                 class="w-full px-4 py-2. 5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent outline-none transition-all text-gray-800 dark:text-white"
+                 [(ngModel)]="walletAddress"
+                 placeholder="0x... ">
         </div>
 
-        <!-- Formulario de validador -->
-        <div class="form-group">
-          <label for="wallet">🔑 Wallet del Validador (ONG)</label>
-          <input type="text" id="wallet" class="form-input" [(ngModel)]="walletAddress" placeholder="0x..." />
-        </div>
-
-        <div class="form-group">
-          <label for="privateKey">🔒 Clave Privada (para firmar transacción)</label>
-          <input type="password" id="privateKey" class="form-input" [(ngModel)]="privateKey"
-            placeholder="Clave privada del validador" />
-          <small class="help-text">⚠️ Tu clave privada NUNCA se almacena, solo se usa para firmar la transacción</small>
+        <div>
+          <label for="privateKey" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-lock"></i>Clave Privada (para firmar transacción)
+          </label>
+          <input type="password" id="privateKey"
+                 class="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent outline-none transition-all text-gray-800 dark:text-white"
+                 [(ngModel)]="privateKey"
+                 placeholder="Clave privada del validador">
+          <p class="mt-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-2">
+            <i class="fa-solid fa-exclamation-triangle"></i>
+            Tu clave privada NUNCA se almacena, solo se usa para firmar la transacción
+          </p>
         </div>
 
         <!-- Razón de rechazo (solo para rechazar) -->
-        <div class="form-group" *ngIf="accionSeleccionada === 'rechazar'">
-          <label for="razon">📝 Razón del Rechazo</label>
-          <textarea id="razon" class="form-textarea" [(ngModel)]="razonRechazo"
-            placeholder="Explica por qué se rechaza esta actividad..." rows="4"></textarea>
+        <div *ngIf="accionSeleccionada === 'rechazar'">
+          <label for="razon" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-file-lines"></i>Razón del Rechazo
+          </label>
+          <textarea id="razon"
+                    class="w-full px-4 py-2. 5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent outline-none transition-all text-gray-800 dark:text-white resize-none"
+                    [(ngModel)]="razonRechazo"
+                    placeholder="Explica por qué se rechaza esta actividad..."
+                    rows="4"></textarea>
         </div>
-
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="cerrarFormulario()">Cancelar</button>
-        <button class="btn-confirmar" [class.btn-aprobar-confirm]="accionSeleccionada === 'aprobar'"
-          [class.btn-rechazar-confirm]="accionSeleccionada === 'rechazar'" (click)="ejecutarAccion()">
-          <span *ngIf="accionSeleccionada === 'aprobar'">✅ Confirmar Aprobación</span>
-          <span *ngIf="accionSeleccionada === 'rechazar'">❌ Confirmar Rechazo</span>
-        </button>
       </div>
 
     </div>
-  </div>
 
+    <!-- Footer del modal -->
+    <div class="sticky bottom-0 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-end gap-3 rounded-b-2xl">
+      <button (click)="cerrarFormulario()"
+              class="px-5 py-2.5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 font-medium">
+        Cancelar
+      </button>
+      <button (click)="ejecutarAccion()"
+              [ngClass]="accionSeleccionada === 'aprobar' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'"
+              class="px-5 py-2.5 text-white rounded-lg transition-colors duration-200 font-medium flex items-center gap-2">
+        <i *ngIf="accionSeleccionada === 'aprobar'" class="fa-solid fa-check"></i>
+        <i *ngIf="accionSeleccionada === 'rechazar'" class="fa-solid fa-times"></i>
+        <span *ngIf="accionSeleccionada === 'aprobar'">Confirmar Aprobación</span>
+        <span *ngIf="accionSeleccionada === 'rechazar'">Confirmar Rechazo</span>
+      </button>
+    </div>
+
+  </div>
 </div>

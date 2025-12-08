@@ -1,53 +1,50 @@
-.logo-section {
-  padding: 20px;
-  text-align: center;
-  background-color: #34495e;
-}
-
-.logo-section h2 {
-  margin: 0;
-  font-size: 20px;
-  color: #27ae60;
-}
-
-.logo-section p {
-  margin: 5px 0 0 0;
-  font-size: 14px;
-  color: #bdc3c7;
-}
-
-mat-nav-list {
-  padding-top: 0;
-}
-
-a[mat-list-item] {
-  color: white;
+.sidebar-item {
   display: flex;
   align-items: center;
-  padding: 15px 20px;
+  gap: 12px;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: #096754;
+  border-radius: 8px;
+  transition: all 0.3s;
+  font-size: 15px;
+}
+
+.sidebar-button {
+  background: transparent;
+  border: none;
   cursor: pointer;
-  transition: background-color 0.3s;
+  width: 100%;
+  text-align: left;
 }
 
-a[mat-list-item]:hover {
-  background-color: #34495e;
+.sidebar-button:hover {
+  background-color: #e8f5f1;
 }
 
-a[mat-list-item].active {
-  background-color: #27ae60;
-  border-left: 4px solid #2ecc71;
+.sidebar-item i {
+  min-width: 20px;
+  text-align: center;
+  font-size: 20px;
 }
 
-a[mat-list-item] mat-icon {
-  margin-right: 15px;
-  color: #ecf0f1;
+.sidebar-text {
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.3s;
+  overflow: hidden;
 }
 
-a[mat-list-item] span {
-  font-size: 16px;
+.sidebar-container.expanded .sidebar-text {
+  opacity: 1;
 }
 
-mat-divider {
-  background-color: #34495e;
-  margin: 10px 0;
+.sidebar-active {
+  background-color: #096754 !important;
+  color: white !important;
+}
+
+.sidebar-active i,
+.sidebar-active span {
+  color: white !important;
 }

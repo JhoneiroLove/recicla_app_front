@@ -1,25 +1,74 @@
-<mat-toolbar style="color: rgb(249, 255, 249); background-color: #096754;" class="custom-toolbar">
-  <div>
-    <button mat-button (click)="redirectHome()">RECICLA UPAO</button>
-  </div>
+<nav class="bg-[#096754] dark:bg-[#2d5f54] text-white shadow-md transition-colors duration-300">
+  <div class="max-w-full px-6 py-2.5">
+    <div class="flex justify-between items-center">
+      <!-- Logo / Brand -->
+      <div>
+        <button
+          (click)="redirectHome()"
+          class="text-lg font-semibold tracking-wide hover:bg-white/10 px-4 py-1.5 rounded-md transition-all duration-300">
+          RECICLA UPAO
+        </button>
+      </div>
 
-  <div class="right-buttons">
-    <button *ngIf="isLoggedIn" mat-button (click)="logout()">Cerrar sesión</button>
-    <button *ngIf="!isLoggedIn" mat-button [matMenuTriggerFor]="menuRegistrar">Iniciar sesión</button>
+      <!-- Right Section -->
+      <div class="flex items-center gap-3">
+        <!-- Dashboard Button -->
+        <button
+          *ngIf="isLoggedIn && userRole === 'PARTICIPANTE'"
+          (click)="navigateToDashboard()"
+          class="px-3 py-1.5 text-sm rounded-md hover:bg-[#0a7a5e] transition-all duration-300 font-medium">
+          Ir al Dashboard
+        </button>
 
-    <!-- Modificar la condición aquí para incluir la verificación del rol -->
-    <button mat-button (click)="navigateToDashboard()" *ngIf="isLoggedIn && userRole === 'PARTICIPANTE'">Ir al Dashboard</button>
+        <!-- Logout / Login Buttons -->
+        <button
+          *ngIf="isLoggedIn"
+          (click)="logout()"
+          class="px-3 py-1.5 text-sm rounded-md hover:bg-[#0a7a5e] transition-all duration-300 font-medium">
+          Cerrar sesión
+        </button>
 
-    <div *ngIf="isLoggedIn">
-      <span>{{ userName }}</span>
+        <!-- Login Menu -->
+        <div *ngIf="!isLoggedIn" class="relative">
+          <button
+            (click)="toggleLoginMenu()"
+            class="px-3 py-1.5 text-sm rounded-md hover:bg-[#0a7a5e] transition-all duration-300 font-medium flex items-center gap-1.5">
+            Iniciar sesión
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div
+            *ngIf="showLoginMenu"
+            class="absolute right-0 mt-2 w-44 bg-white rounded-md shadow-2xl overflow-hidden z-50 border-2 border-gray-100">
+            <button
+              routerLink="login"
+              (click)="toggleLoginMenu()"
+              class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-[#096754] hover:text-white transition-all duration-200">
+              Iniciar Sesión
+            </button>
+            <div class="border-t border-gray-100"></div>
+            <button
+              routerLink="signup"
+              (click)="toggleLoginMenu()"
+              class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-[#096754] hover:text-white transition-all duration-200">
+              Crear cuenta
+            </button>
+          </div>
+        </div>
+
+        <!-- User Name Badge -->
+        <div
+          *ngIf="isLoggedIn"
+          class="px-3 py-1.5 bg-[#0a7a5e] dark:bg-[#3d6f64] rounded-full text-sm font-medium">
+          {{ userName }}
+        </div>
+      </div>
     </div>
-
-    <mat-menu #menuRegistrar="matMenu">
-      <button mat-menu-item routerLink="login">Iniciar Sesión</button>
-      <button mat-menu-item routerLink="signup">Crear cuenta</button>
-    </mat-menu>
   </div>
-</mat-toolbar>
+</nav>
 
 
 

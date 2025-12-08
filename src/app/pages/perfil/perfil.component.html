@@ -1,32 +1,152 @@
-<div class="bootstrap-wrapper">
-  <div class="container">
-    <div class="row">
-      <h2 class="text-center">Mi Perfil </h2> 
-      <div *ngIf="isLoggedIn">
-        <table mat-table [dataSource]="createUserData()" class="tabla">
-
-          <!-- Columnas de la tabla -->
-          <ng-container matColumnDef="field">
-            <th mat-header-cell *matHeaderCellDef> Campo </th>
-            <td class="bold" mat-cell *matCellDef="let element"> {{element.field}} </td>
-          </ng-container>
-
-          <ng-container matColumnDef="value">
-            <th mat-header-cell *matHeaderCellDef> Valor </th>
-            <td mat-cell *matCellDef="let element"> {{element.value}} </td>
-          </ng-container>
-
-          <!-- Encabezado de la tabla -->
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <!-- Filas de la tabla -->
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+<div class="min-h-screen pr-6 py-6 transition-all duration-300"
+     [ngClass]="(sidebarExpanded$ | async) ? 'pl-[235px]' : 'pl-[75px]'">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center gap-2.5 mb-5">
+      <div class="bg-gradient-to-r from-[#096754] to-[#0a7a5e] p-2 rounded-lg shadow-lg">
+        <i class="fa-solid fa-user text-white text-xl"></i>
       </div>
-
-      <div *ngIf="!isLoggedIn">
-        <p>Por favor, inicia sesión para ver esta página.</p>
+      <div>
+        <h2 class="text-xl font-bold text-gray-800 dark:text-white">Mi Perfil</h2>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Información personal de tu cuenta</p>
       </div>
     </div>
+
+    <!-- Contenido -->
+    <div *ngIf="isLoggedIn" class="space-y-4">
+      <!-- Card de Avatar y Nombre -->
+      <div class="bg-white dark:bg-[#252d3d] rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-[#096754] to-[#0a7a5e] px-6 py-6 flex items-center gap-4">
+          <div class="bg-white dark:bg-[#1a1f2e] p-2 rounded-full shadow-xl">
+            <div class="w-20 h-20 bg-gradient-to-br from-[#096754] to-[#0a7a5e] rounded-full flex items-center justify-center">
+              <i class="fa-solid fa-user text-white text-3xl"></i>
+            </div>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-2xl font-bold text-white mb-1">{{ loginService.getUserDetails()?.nombre }}</h3>
+            <p class="text-white/80 text-sm">@{{ loginService.getUserDetails()?.username }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards de Información -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Información Personal -->
+        <div class="bg-white dark:bg-[#252d3d] rounded-lg shadow-lg p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="bg-blue-100 dark:bg-blue-900/30 p-1.5 rounded-lg">
+              <i class="fa-solid fa-id-card text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <h4 class="text-sm font-semibold text-gray-800 dark:text-white">Información Personal</h4>
+          </div>
+          <div class="space-y-3">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-user text-gray-400 w-4 text-sm mt-0.5"></i>
+              <div class="flex-1">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Nombre Completo</p>
+                <p class="text-sm text-gray-800 dark:text-white font-medium">{{ loginService.getUserDetails()?.nombre }}</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-fingerprint text-gray-400 w-4 text-sm mt-0.5"></i>
+              <div class="flex-1">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">DNI</p>
+                <p class="text-sm text-gray-800 dark:text-white font-medium">{{ loginService.getUserDetails()?.dni }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información de Contacto -->
+        <div class="bg-white dark:bg-[#252d3d] rounded-lg shadow-lg p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="bg-green-100 dark:bg-green-900/30 p-1.5 rounded-lg">
+              <i class="fa-solid fa-address-book text-green-600 dark:text-green-400"></i>
+            </div>
+            <h4 class="text-sm font-semibold text-gray-800 dark:text-white">Información de Contacto</h4>
+          </div>
+          <div class="space-y-3">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-envelope text-gray-400 w-4 text-sm mt-0.5"></i>
+              <div class="flex-1">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Correo Electrónico</p>
+                <p class="text-sm text-gray-800 dark:text-white font-medium break-all">{{ loginService.getUserDetails()?.correo }}</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-phone text-gray-400 w-4 text-sm mt-0.5"></i>
+              <div class="flex-1">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Teléfono</p>
+                <p class="text-sm text-gray-800 dark:text-white font-medium">{{ loginService.getUserDetails()?.telefono }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información de Cuenta -->
+        <div class="bg-white dark:bg-[#252d3d] rounded-lg shadow-lg p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="bg-purple-100 dark:bg-purple-900/30 p-1.5 rounded-lg">
+              <i class="fa-solid fa-shield-halved text-purple-600 dark:text-purple-400"></i>
+            </div>
+            <h4 class="text-sm font-semibold text-gray-800 dark:text-white">Información de Cuenta</h4>
+          </div>
+          <div class="space-y-3">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-at text-gray-400 w-4 text-sm mt-0.5"></i>
+              <div class="flex-1">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Usuario</p>
+                <p class="text-sm text-gray-800 dark:text-white font-medium">{{ loginService.getUserDetails()?.username }}</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-layer-group text-gray-400 w-4 text-sm mt-0.5"></i>
+              <div class="flex-1">
+                <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Nivel</p>
+                <div class="flex items-center gap-2">
+                  <span class="bg-gradient-to-r from-[#096754] to-[#0a7a5e] text-white px-2.5 py-0.5 rounded-full text-xs font-medium">
+                    {{ loginService.getUserDetails()?.nivel }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estadísticas Rápidas -->
+        <div class="bg-gradient-to-br from-[#096754] to-[#0a7a5e] rounded-lg shadow-lg p-4 text-white">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="bg-white/20 p-1.5 rounded-lg">
+              <i class="fa-solid fa-chart-line text-white"></i>
+            </div>
+            <h4 class="text-sm font-semibold">Estado de la Cuenta</h4>
+          </div>
+          <div class="space-y-2">
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-white/80 text-xs">Estado</span>
+                <span class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-circle-check text-green-300 text-sm"></i>
+                  <span class="font-medium text-sm">Activo</span>
+                </span>
+              </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-white/80 text-xs">Cuenta verificada</span>
+                <i class="fa-solid fa-check-double text-green-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje si no está logueado -->
+    <div *ngIf="!isLoggedIn" class="bg-white dark:bg-[#252d3d] rounded-xl shadow-lg p-8 text-center">
+      <i class="fa-solid fa-lock text-gray-300 dark:text-gray-600 text-4xl mb-3"></i>
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-1.5">Acceso Restringido</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Por favor, inicia sesión para ver tu perfil.</p>
+    </div>
   </div>
-</div>}
-  
+</div>

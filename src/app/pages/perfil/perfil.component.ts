@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LoginService } from 'src/app/service/login.service';
+import { SidebarService } from 'src/app/service/sidebar.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-perfil',
@@ -8,8 +10,14 @@ import { LoginService } from 'src/app/service/login.service';
 })
 export class PerfilComponent implements OnInit {
   displayedColumns: string[] = ['field', 'value'];
+  sidebarExpanded$: Observable<boolean>;
 
-  constructor(public loginService: LoginService) { }
+  constructor(
+    public loginService: LoginService,
+    private sidebarService: SidebarService
+  ) {
+    this.sidebarExpanded$ = this.sidebarService.expanded$;
+  }
 
   ngOnInit(): void {
   }

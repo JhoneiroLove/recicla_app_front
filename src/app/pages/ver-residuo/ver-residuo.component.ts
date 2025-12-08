@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
+import { Router } from '@angular/router';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ResiduoService } from 'src/app/service/residuo.service';
+import { SidebarService } from 'src/app/service/sidebar.service';
+import { Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -12,12 +16,71 @@ export class VerResiduoComponent implements OnInit {
   residuos: any[] = [];
   totalElements: number = 0;
   currentPage: number = 0;
-  pageSize: number = 5; // Variable para almacenar el tamaño de página seleccionado
+  pageSize: number = 8; // Variable para almacenar el tamaño de página seleccionado
+  totalPages: number = 0;
+  Math = Math;
+  sidebarExpanded$: Observable<boolean>;
+  mostrarModalRegistro: boolean = false;
+  mostrarModalEdicion: boolean = false;
+  residuoForm!: FormGroup;
+  editarResiduoForm!: FormGroup;
+  residuoActual: any = null;
 
-  constructor(private residuoService: ResiduoService) { }
+  constructor(
+    private residuoService: ResiduoService,
+    private sidebarService: SidebarService,
+    private router: Router
+  ) {
+    this.sidebarExpanded$ = this.sidebarService.expanded$;
+  }
 
   ngOnInit() {
     this.cargarResiduos();
+    this.inicializarFormulario();
+    this.inicializarFormularioEditar();
+  }
+
+  inicializarFormulario(): void {
+    this.residuoForm = new FormGroup({
+      nombre: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/),
+        Validators.maxLength(25)
+      ]),
+      descripcion: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/),
+        Validators.maxLength(30)
+      ]),
+      tipo: new FormControl('', [Validators.required]),
+      puntos: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^[0-9]+$/),
+        Validators.min(1)
+      ])
+    });
+  }
+
+  inicializarFormularioEditar(): void {
+    this.editarResiduoForm = new FormGroup({
+      id: new FormControl(''),
+      nombre: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/),
+        Validators.maxLength(25)
+      ]),
+      descripcion: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/),
+        Validators.maxLength(30)
+      ]),
+      tipo: new FormControl('', [Validators.required]),
+      puntos: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^[0-9]+$/),
+        Validators.min(1)
+      ])
+    });
   }
 
   cargarResiduos(event?: PageEvent) {
@@ -29,7 +92,61 @@ export class VerResiduoComponent implements OnInit {
       this.residuos = data.content;
       this.totalElements = data.totalElements;
       this.currentPage = data.number;
+      this.totalPages = data.totalPages;
     });
+  }
+
+  cambiarPagina(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.cargarResiduos();
+    }
+  }
+
+  abrirModalRegistro(): void {
+    this.mostrarModalRegistro = true;
+  }
+
+  cerrarModalRegistro(): void {
+    this.mostrarModalRegistro = false;
+    this.residuoForm.reset();
+  }
+
+  submitFormRegistro(): void {
+    if (this.residuoForm.valid) {
+      const nuevoResiduo = this.residuoForm.value;
+
+      // Verificar duplicados
+      const nombreDuplicado = this.residuos.some(
+        (residuo) => residuo.nombre.toLowerCase() === nuevoResiduo.nombre.toLowerCase()
+      );
+      const descripcionDuplicada = this.residuos.some(
+        (residuo) => residuo.descripcion.toLowerCase() === nuevoResiduo.descripcion.toLowerCase()
+      );
+
+      if (nombreDuplicado) {
+        Swal.fire('Error', 'Ya existe un residuo con el mismo nombre.', 'error');
+        return;
+      }
+      if (descripcionDuplicada) {
+        Swal.fire('Error', 'Ya existe un residuo con la misma descripción.', 'error');
+        return;
+      }
+
+      // Registrar residuo
+      this.residuoService.addResiduo(nuevoResiduo).subscribe(
+        response => {
+          Swal.fire('¡Éxito!', 'El residuo ha sido registrado exitosamente.', 'success');
+          this.cerrarModalRegistro();
+          this.cargarResiduos();
+        },
+        error => {
+          Swal.fire('Error', 'Ha ocurrido un error al registrar el residuo.', 'error');
+        }
+      );
+    } else {
+      Swal.fire('Datos incompletos', 'Por favor, completa todos los campos del formulario.', 'warning');
+    }
   }
 
   eliminarResiduo(id: number) {
@@ -62,95 +179,63 @@ export class VerResiduoComponent implements OnInit {
   }
 
   actualizarResiduo(residuo: any) {
-    Swal.fire({
-      title: 'Actualizar Residuo',
-      html:
-        `<div style="display: flex; flex-direction: column; gap: 10px; text-align: left;">
-         <label for="nombre" style="font-weight: bold;">Nombre del Residuo:</label>
-         <input  id="nombre" class="swal2-input" placeholder="Nombre" value="${residuo.nombre}">
-
-         <label for="descripcion" style="font-weight: bold;">Descripción:</label>
-         <input id="descripcion" class="swal2-input" placeholder="Descripción" value="${residuo.descripcion}">
-
-         <label for="tipo" style="font-weight: bold;">Tipo de Residuo:</label>
-         <select id="tipo" class="swal2-input">
-           <option value="Vidrio" ${residuo.tipo === 'Vidrio' ? 'selected' : ''}>Vidrio</option>
-           <option value="Plástico" ${residuo.tipo === 'Plástico' ? 'selected' : ''}>Plástico</option>
-           <option value="Papel" ${residuo.tipo === 'Papel' ? 'selected' : ''}>Papel</option>
-           <option value="General" ${residuo.tipo === 'General' ? 'selected' : ''}>General</option>
-         </select>
-
-         <label for="puntos" style="font-weight: bold;">Puntos:</label>
-         <input id="puntos" class="swal2-input" placeholder="Puntos" type="number" value="${residuo.puntos}">
-       </div>`,
-      focusConfirm: false,
-      preConfirm: () => {
-        const nombre = (document.getElementById('nombre') as HTMLInputElement).value;
-        const descripcion = (document.getElementById('descripcion') as HTMLInputElement).value;
-        const tipo = (document.getElementById('tipo') as HTMLSelectElement).value;
-        const puntos = (document.getElementById('puntos') as HTMLInputElement).value;
-
-        const soloLetrasRegex = /^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/;
-
-        if (!nombre || !soloLetrasRegex.test(nombre) || nombre.length > 25) {
-          Swal.showValidationMessage('El nombre solo debe contener letras, sin números y máximo 25 caracteres.');
-          return false;
-        }
-
-        if (!descripcion || !soloLetrasRegex.test(descripcion) || descripcion.length > 30) {
-          Swal.showValidationMessage('La descripción solo debe contener letras, sin números y máximo 30 caracteres.');
-          return false;
-        }
-
-        if (isNaN(Number(puntos)) || Number(puntos) <= 0) {
-          Swal.showValidationMessage('Los puntos deben ser un número mayor a 0.');
-          return false;
-        }
-
-        return { nombre, descripcion, tipo, puntos, id: residuo.id };
-      },
-      confirmButtonText: 'Aceptar',
-      showCancelButton: true,
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const { nombre, descripcion } = result.value;
-
-        const { nombreDuplicado, descripcionDuplicada } = this.validarDuplicados(nombre, descripcion, residuo.id);
-
-        if (nombreDuplicado) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ya existe un residuo con el mismo nombre.'
-          });
-        } else if (descripcionDuplicada) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ya existe un residuo con la misma descripción.'
-          });
-        } else {
-          this.residuoService.updateResiduo(result.value).subscribe(
-            response => {
-              Swal.fire({
-                icon: 'success',
-                title: 'Residuo Actualizado',
-                text: 'El residuo ha sido actualizado correctamente.'
-              });
-              this.cargarResiduos();
-            },
-            error => {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Hubo un problema al actualizar el residuo.'
-              });
-            }
-          );
-        }
-      }
+    this.residuoActual = residuo;
+    this.editarResiduoForm.patchValue({
+      id: residuo.id,
+      nombre: residuo.nombre,
+      descripcion: residuo.descripcion,
+      tipo: residuo.tipo,
+      puntos: residuo.puntos
     });
+    this.mostrarModalEdicion = true;
+  }
+
+  cerrarModalEdicion(): void {
+    this.mostrarModalEdicion = false;
+    this.editarResiduoForm.reset();
+    this.residuoActual = null;
+  }
+
+  submitFormEditar(): void {
+    if (this.editarResiduoForm.valid) {
+      const residuoActualizado = this.editarResiduoForm.value;
+      const { nombre, descripcion } = residuoActualizado;
+
+      const { nombreDuplicado, descripcionDuplicada } = this.validarDuplicados(nombre, descripcion, residuoActualizado.id);
+
+      if (nombreDuplicado) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ya existe un residuo con el mismo nombre.'
+        });
+      } else if (descripcionDuplicada) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ya existe un residuo con la misma descripción.'
+        });
+      } else {
+        this.residuoService.updateResiduo(residuoActualizado).subscribe(
+          response => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Residuo Actualizado',
+              text: 'El residuo ha sido actualizado correctamente.'
+            });
+            this.cargarResiduos();
+            this.cerrarModalEdicion();
+          },
+          error => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Hubo un problema al actualizar el residuo.'
+            });
+          }
+        );
+      }
+    }
   }
 
 

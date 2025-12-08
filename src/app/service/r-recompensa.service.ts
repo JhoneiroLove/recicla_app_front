@@ -15,9 +15,12 @@ export class RRecompensaService {
     return this.httpClient.post(`${baserUrl}/recompensa/crear`, formData);
   }
 
-  
-  public listarRecompensa(): Observable<Recompensa> {
-    return this.httpClient.get<Recompensa>(`${baserUrl}/recompensa/catalogo`);
+
+  public listarRecompensa(pageable?: any): Observable<any> {
+    if (pageable) {
+      return this.httpClient.get<any>(`${baserUrl}/recompensa/catalogo`, { params: pageable });
+    }
+    return this.httpClient.get<any>(`${baserUrl}/recompensa/catalogo`);
   }
   canjearRecompensa(nombreRecompensa: string): Observable<any> {
     return this.httpClient.post(`${baserUrl}/canje/canjear`, null, {
@@ -30,8 +33,8 @@ export class RRecompensaService {
   actualizarRecompensa(recompensa: Recompensa): Observable<any> {
     return this.httpClient.put(`${baserUrl}/recompensa/editar/${recompensa.id}`, recompensa);
   }
-  
-  
-  
+
+
+
 }
 

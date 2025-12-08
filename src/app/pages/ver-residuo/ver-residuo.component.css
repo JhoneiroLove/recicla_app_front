@@ -1,52 +1,12 @@
-.container {
-    background-color: #ffffffda;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-top: 15px;
-    margin-bottom: 50px;
-  }
-  h2 {
-    font-size: 24px;
-    color: #096754;
-  }
+/* Estilos manejados con Tailwind CSS */
 
-  mat-paginator{
-    background-color: #fdfffc00;
-    color: #096754;
-    margin-top: 10px;
-  }
-
-button[type="submit"] {
-    background-color: #fdfffc;
-    color: #179CBB;
-    margin: 10px 10px 10px;
-  }
-
-  button[type="reset"] {
-    background-color: #ffffff;
-    color: #FF6F61;
-    margin: 10px 10px 10px;
-  }
-
-  .residuo-card{
-    max-width: 300px; /* Ajusta el ancho máximo de la tarjeta */
-    margin: 10px; /* Espacio alrededor de cada tarjeta */
-    display: flex;
-
-  }
-
-  .cards-container{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .juntos{
-    display: flex;
-    margin-top: 2px;
-    justify-content: space-between;
-  }
+/* Truncar texto con ellipsis después de 2 líneas */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
   .bold {
     font-weight: bold; /* Aplica negrita */

@@ -3,6 +3,7 @@ import {
   BlockchainService,
   ActividadPropuesta,
 } from '../../service/blockchain.service';
+import { SidebarService } from '../../service/sidebar.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -12,8 +13,16 @@ import Swal from 'sweetalert2';
 })
 export class PanelValidacionOngComponent implements OnInit {
   propuestasPendientes: ActividadPropuesta[] = [];
+  propuestasPaginadas: ActividadPropuesta[] = [];
   cargando: boolean = false;
   mostrarFormulario: boolean = false;
+  sidebarExpanded$: any;
+
+  // Paginación
+  currentPage: number = 0;
+  pageSize: number = 6;
+  totalPages: number = 0;
+  Math = Math;
 
   // Datos del validador
   walletAddress: string = '';
@@ -32,9 +41,13 @@ export class PanelValidacionOngComponent implements OnInit {
     organico: 'Orgánico',
   };
 
-  constructor(private blockchainService: BlockchainService) {}
+  constructor(
+    private blockchainService: BlockchainService,
+    private sidebarService: SidebarService
+  ) {}
 
   ngOnInit(): void {
+    this.sidebarExpanded$ = this.sidebarService.expanded$;
     this.cargarPropuestas();
   }
 
@@ -43,6 +56,8 @@ export class PanelValidacionOngComponent implements OnInit {
     this.blockchainService.getPropuestasPendientes().subscribe({
       next: (propuestas) => {
         this.propuestasPendientes = propuestas;
+        this.totalPages = Math.ceil(propuestas.length / this.pageSize);
+        this.actualizarPagina();
         this.cargando = false;
       },
       error: (error) => {
@@ -55,6 +70,19 @@ export class PanelValidacionOngComponent implements OnInit {
         this.cargando = false;
       },
     });
+  }
+
+  actualizarPagina(): void {
+    const start = this.currentPage * this.pageSize;
+    const end = start + this.pageSize;
+    this.propuestasPaginadas = this.propuestasPendientes.slice(start, end);
+  }
+
+  cambiarPagina(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.actualizarPagina();
+    }
   }
 
   getNombreMaterial(tipo: string): string {

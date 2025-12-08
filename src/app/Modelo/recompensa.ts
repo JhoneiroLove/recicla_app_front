@@ -6,5 +6,6 @@ export interface Recompensa {
     valor: number;
     imagenPath: string;
     id: number;
+    fechaInicio?: string;
+    fechaCierre?: string;
     }
-    

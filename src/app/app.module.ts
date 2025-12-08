@@ -65,6 +65,7 @@ import { SlidebarOngComponent } from './components/slidebar-ong/slidebar-ong.com
 import { CentroDashboardComponent } from './pages/centro/centro-dashboard/centro-dashboard.component';
 import { SlidebarCentroComponent } from './components/slidebar-centro/slidebar-centro.component';
 import { RegistrarActividadCentroComponent } from './pages/centro/registrar-actividad-centro/registrar-actividad-centro.component';
+import { HistorialCentroComponent } from './pages/centro/historial-centro/historial-centro.component';
 
 @NgModule({
   declarations: [
@@ -98,6 +99,7 @@ import { RegistrarActividadCentroComponent } from './pages/centro/registrar-acti
     CentroDashboardComponent,
     SlidebarCentroComponent,
     RegistrarActividadCentroComponent,
+    HistorialCentroComponent,
   ],
   imports: [
     BrowserModule,

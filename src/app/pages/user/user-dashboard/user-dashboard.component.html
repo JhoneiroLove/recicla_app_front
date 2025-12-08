@@ -1,13 +1,7 @@
-<div class="bootstrap-wrapper">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-3">
-          <app-slidebar></app-slidebar>
-        </div>
-        <div class="col-md-9">
-          <router-outlet></router-outlet>
-        </div>
-      </div>
-    </div>
-  
-  
+<app-slidebar></app-slidebar>
+
+<div class="ml-[235px] transition-all duration-300 p-6 min-h-screen bg-gray-50 dark:bg-[#0f1419]"
+     [ngClass]="{'ml-[235px]': isExpanded, 'ml-[75px]': !isExpanded}">
+  <router-outlet></router-outlet>
+</div>
+

@@ -25,6 +25,7 @@ import { OngGuard } from './service/ong.guard';
 import { CentroDashboardComponent } from './pages/centro/centro-dashboard/centro-dashboard.component';
 import { CentroAcopioGuard } from './service/centro-acopio.guard';
 import { RegistrarActividadCentroComponent } from './pages/centro/registrar-actividad-centro/registrar-actividad-centro.component';
+import { HistorialCentroComponent } from './pages/centro/historial-centro/historial-centro.component';
 
 const routes: Routes = [
   {
@@ -134,7 +135,7 @@ const routes: Routes = [
       },
       {
         path: 'historial',
-        component: VHistorialComponent,
+        component: HistorialCentroComponent,
       },
       {
         path: 'perfil',

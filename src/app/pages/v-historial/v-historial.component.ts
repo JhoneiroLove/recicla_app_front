@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ReActividadService } from 'src/app/service/re-actividad.service';
+import { BlockchainService } from 'src/app/service/blockchain.service';
+import { LoginService } from 'src/app/service/login.service';
 import Swal from 'sweetalert2';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSelectChange } from '@angular/material/select';
@@ -13,17 +15,34 @@ import 'jspdf-autotable';
 })
 export class VHistorialComponent implements OnInit {
   actividades = new MatTableDataSource<any>([]);  // Usamos MatTableDataSource para las actividades
-  displayedColumns: string[] = ['nombre', 'cantidad', 'residuo', 'puntosGanados', 'fecha', 'imagen', 'compartir'];
+  displayedColumns: string[] = ['nombre', 'cantidad', 'residuo', 'puntosGanados', 'estado', 'fecha', 'imagen', 'compartir'];
+
+  // Balance de tokens REC
+  balanceREC: number = 0;
+  walletAddress: string = '';
+  cargandoBalance: boolean = false;
 
   filtroNombre: string = '';  // Valor del filtro para el nombre de la actividad
   filtroResiduo: string = '';  // Valor del filtro para el tipo de residuo
   ordenCantidad: string = '';  // Valor del filtro para la cantidad (mayor a menor o menor a mayor)
   residuosDisponibles: string[] = [];  // Lista de tipos de residuos registrados por el usuario
   actividadesOriginal: any[] = [];  // Para guardar el estado original de las actividades
+  mostrarFiltros: boolean = true;
 
-  constructor(private reActividadService: ReActividadService) { }
+  constructor(
+    private reActividadService: ReActividadService,
+    private blockchainService: BlockchainService,
+    private loginService: LoginService
+  ) { }
 
   ngOnInit(): void {
+    // Obtenemos la wallet del usuario desde el token
+    const userDetails = this.loginService.getUserDetails();
+    if (userDetails && userDetails.walletAddress) {
+      this.walletAddress = userDetails.walletAddress;
+      this.cargarBalance();
+    }
+
     // Obtenemos el historial de actividades del usuario
     this.reActividadService.obtenerHistorialPorUsuario().subscribe(
       (response) => {
@@ -40,6 +59,48 @@ export class VHistorialComponent implements OnInit {
     );
   }
 
+  cargarBalance(): void {
+    if (!this.walletAddress) return;
+
+    this.cargandoBalance = true;
+    this.blockchainService.getBalance(this.walletAddress).subscribe(
+      (response) => {
+        this.balanceREC = response.balance || 0;
+        this.cargandoBalance = false;
+        console.log('Balance REC:', this.balanceREC);
+      },
+      (error) => {
+        console.error('Error al obtener balance:', error);
+        this.cargandoBalance = false;
+        this.balanceREC = 0;
+      }
+    );
+  }
+
+  obtenerClaseEstado(estado: string): string {
+    switch(estado?.toUpperCase()) {
+      case 'APROBADA':
+        return 'estado-aprobada';
+      case 'RECHAZADA':
+        return 'estado-rechazada';
+      case 'PENDIENTE':
+      default:
+        return 'estado-pendiente';
+    }
+  }
+
+  obtenerIconoEstado(estado: string): string {
+    switch(estado?.toUpperCase()) {
+      case 'APROBADA':
+        return 'fa-check-circle';
+      case 'RECHAZADA':
+        return 'fa-times-circle';
+      case 'PENDIENTE':
+      default:
+        return 'fa-clock';
+    }
+  }
+
   // Filtro por nombre de actividad
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -48,15 +109,27 @@ export class VHistorialComponent implements OnInit {
   }
 
   // Filtro por tipo de residuo
-  applyResiduoFilter(event: MatSelectChange) {
-    this.filtroResiduo = event.value;
+  applyResiduoFilter(event: any) {
+    this.filtroResiduo = (event.target as HTMLSelectElement).value;
     this.applyFilters();  // Aplicamos todos los filtros
   }
 
   // Filtro para ordenar por cantidad (mayor a menor o menor a mayor)
-  applyCantidadSort(event: MatSelectChange) {
-    this.ordenCantidad = event.value;
+  applyCantidadSort(event: any) {
+    this.ordenCantidad = (event.target as HTMLSelectElement).value;
     this.applyFilters();  // Aplicamos todos los filtros
+  }
+
+  // Toggle para ordenar cantidad desde el icono en la tabla
+  toggleOrdenCantidad() {
+    if (this.ordenCantidad === '' || this.ordenCantidad === 'todos') {
+      this.ordenCantidad = 'mayorMenor';
+    } else if (this.ordenCantidad === 'mayorMenor') {
+      this.ordenCantidad = 'menorMayor';
+    } else {
+      this.ordenCantidad = 'todos';
+    }
+    this.applyFilters();
   }
 
   // Método para aplicar los filtros (por nombre, residuo, y orden de cantidad)

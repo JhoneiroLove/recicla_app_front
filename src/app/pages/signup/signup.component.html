@@ -1,112 +1,154 @@
-<div class="bootstrap-wrapper">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-6 offset-md-3">
-        <mat-card>
-          <div class="container text-center">
-            <img src="../../../assets/icon.png" width="100" height="100">
-          </div>
-
-          <h1 class="text-center">Registrate</h1>
-
-          <!-- Sección de conexión de wallet -->
-          <div class="wallet-section" style="margin-bottom: 20px;">
-            <div *ngIf="!walletConnected" class="text-center">
-              <button type="button" mat-raised-button color="primary" (click)="connectWallet()"
-                [disabled]="isConnectingWallet" style="width: 100%;">
-                <mat-icon *ngIf="!isConnectingWallet">account_balance_wallet</mat-icon>
-                <mat-spinner *ngIf="isConnectingWallet" diameter="20"
-                  style="display: inline-block; margin-right: 8px;"></mat-spinner>
-                {{ isConnectingWallet ? 'Conectando...' : 'Conectar MetaMask' }}
-              </button>
-              <p style="margin-top: 10px; font-size: 12px; color: #666;">
-                Debes conectar tu wallet de MetaMask para registrarte
-              </p>
-            </div>
-
-            <div *ngIf="walletConnected" class="wallet-connected"
-              style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; text-align: center;">
-              <mat-icon style="color: #4caf50; vertical-align: middle;">check_circle</mat-icon>
-              <span style="margin-left: 8px; color: #2e7d32; font-weight: 500;">Wallet Conectada</span>
-              <p style="margin: 8px 0 0 0; font-size: 12px; color: #555; word-break: break-all;">
-                {{ walletAddress.substring(0, 6) }}...{{ walletAddress.substring(38) }}
-              </p>
-            </div>
-          </div>
-
-          <form [formGroup]="signupForm" (ngSubmit)="formSubmit()">
-            <mat-form-field class="full-width" appearance="outline">
-              <mat-label>Nombre</mat-label>
-              <input matInput formControlName="nombre" placeholder="Digite su nombre">
-              <mat-error *ngIf="signupForm.get('nombre')!.invalid && signupForm.get('nombre')!.touched">El nombre es
-                requerido y solo puede contener letras max. 12 caracteres</mat-error>
-            </mat-form-field>
-
-            <mat-form-field class="full-width" appearance="outline">
-              <mat-label>Edad</mat-label>
-              <input matInput formControlName="edad" placeholder="Digite su edad" type="number">
-              <mat-error *ngIf="signupForm.get('edad')!.invalid && signupForm.get('edad')!.touched">La edad debe estar
-                entre 16 y 100 años</mat-error>
-            </mat-form-field>
-
-            <mat-form-field class="full-width" appearance="outline">
-              <mat-label>Teléfono</mat-label>
-              <input matInput formControlName="telefono" placeholder="Digite su teléfono">
-              <mat-hint>El numero de telefono debe ser único</mat-hint>
-              <mat-error *ngIf="signupForm.get('telefono')!.invalid && signupForm.get('telefono')!.touched">Ingresar
-                numero teléfono valido</mat-error>
-            </mat-form-field>
-
-            <mat-form-field class="full-width" appearance="outline">
-              <mat-label>Email</mat-label>
-              <input matInput formControlName="correo" placeholder="Digite su email" type="email">
-              <mat-hint>El correo de usuario debe ser único</mat-hint>
-              <mat-error *ngIf="signupForm.get('correo')!.invalid && signupForm.get('correo')!.touched">Introduzca un
-                correo válido</mat-error>
-            </mat-form-field>
-
-            <mat-form-field class="full-width" appearance="outline">
-              <mat-label>Nombre de usuario</mat-label>
-              <input matInput formControlName="username" placeholder="Digite su nombre de usuario">
-              <mat-hint>El nombre de usuario debe ser único</mat-hint>
-              <mat-error *ngIf="signupForm.get('username')!.invalid && signupForm.get('username')!.touched">El nombre de
-                usuario es requerido max. 9 caracteres</mat-error>
-            </mat-form-field>
-
-            <mat-form-field class="full-width" appearance="outline">
-              <mat-label>Contraseña</mat-label>
-              <input matInput formControlName="password" placeholder="Digite su contraseña" type="password">
-              <mat-error *ngIf="signupForm.get('password')!.invalid && signupForm.get('password')!.touched">La
-                contraseña debe tener al menos 3 caracteres</mat-error>
-            </mat-form-field>
-
-            <mat-form-field class="full-width" appearance="outline">
-              <mat-label>DNI</mat-label>
-              <input matInput formControlName="dni" placeholder="Digite su DNI">
-              <mat-hint>El numero de DNI debe ser único</mat-hint>
-              <mat-error *ngIf="signupForm.get('dni')!.invalid && signupForm.get('dni')!.touched">Ingresar un numero de
-                DNI valido</mat-error>
-            </mat-form-field>
-
-            <!-- Campo oculto para wallet address (se llena automáticamente) -->
-            <input type="hidden" formControlName="walletAddress">
-
-            <div class="container text-center">
-              <button type="submit" mat-raised-button [disabled]="!walletConnected || signupForm.invalid">
-                Registrar
-              </button>
-              <p *ngIf="!walletConnected" style="margin-top: 10px; font-size: 12px; color: #ff5722;">
-                Conecta tu wallet para habilitar el registro
-              </p>
-            </div>
-          </form>
-
-
-
-
-        </mat-card>
-        <br><br><br>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:bg-[#1a1f2e] py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl w-full">
+    <div class="bg-white dark:bg-[#252d3d] rounded-xl shadow-lg dark:shadow-xl p-8">
+      <!-- Logo -->
+      <div class="flex justify-center mb-6">
+        <img src="../../../assets/icon.png" width="100" height="100" class="rounded-full" alt="Register">
       </div>
+
+      <!-- Título -->
+      <h1 class="text-3xl font-bold text-center text-[#096754] dark:text-white mb-8">
+        Registrate
+      </h1>
+
+      <!-- Sección de conexión de wallet -->
+      <div class="mb-6">
+        <!-- Botón conectar wallet -->
+        <div *ngIf="!walletConnected" class="text-center">
+          <button
+            type="button"
+            (click)="connectWallet()"
+            [disabled]="isConnectingWallet"
+            class="w-full bg-[#096754] hover:bg-[#0a7a5e] disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2">
+            <i *ngIf="!isConnectingWallet" class="fa-solid fa-wallet"></i>
+            <svg *ngIf="isConnectingWallet" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>{{ isConnectingWallet ? 'Conectando...' : 'Conectar MetaMask' }}</span>
+          </button>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            Debes conectar tu wallet de MetaMask para registrarte
+          </p>
+        </div>
+
+        <!-- Wallet conectada -->
+        <div *ngIf="walletConnected" class="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg p-4 text-center">
+          <div class="flex items-center justify-center gap-2 mb-2">
+            <i class="fa-solid fa-circle-check text-green-600 dark:text-green-400 text-xl"></i>
+            <span class="text-green-700 dark:text-green-300 font-semibold">Wallet Conectada</span>
+          </div>
+          <p class="text-sm text-gray-700 dark:text-gray-300 break-all">
+            {{ walletAddress.substring(0, 6) }}...{{ walletAddress.substring(38) }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="signupForm" (ngSubmit)="formSubmit()" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Nombre -->
+          <div>
+            <label class="block text-sm font-medium text-[#096754] dark:text-white mb-2">Nombre</label>
+            <input
+              formControlName="nombre"
+              placeholder="Digite su nombre"
+              class="w-full px-4 py-3 bg-white dark:bg-[#1a1f2e] border-2 border-gray-200 dark:border-[#3a4255] rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-[#096754] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300">
+            <p *ngIf="signupForm.get('nombre')!.invalid && signupForm.get('nombre')!.touched" class="mt-1 text-xs text-red-500">El nombre es requerido y solo puede contener letras max. 12 caracteres</p>
+          </div>
+
+          <!-- Edad -->
+          <div>
+            <label class="block text-sm font-medium text-[#096754] dark:text-white mb-2">Edad</label>
+            <input
+              formControlName="edad"
+              placeholder="Digite su edad"
+              type="number"
+              class="w-full px-4 py-3 bg-white dark:bg-[#1a1f2e] border-2 border-gray-200 dark:border-[#3a4255] rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-[#096754] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300">
+            <p *ngIf="signupForm.get('edad')!.invalid && signupForm.get('edad')!.touched" class="mt-1 text-xs text-red-500">La edad debe estar entre 16 y 100 años</p>
+          </div>
+
+          <!-- Teléfono -->
+          <div>
+            <label class="block text-sm font-medium text-[#096754] dark:text-white mb-2">Teléfono</label>
+            <input
+              formControlName="telefono"
+              placeholder="Digite su teléfono"
+              class="w-full px-4 py-3 bg-white dark:bg-[#1a1f2e] border-2 border-gray-200 dark:border-[#3a4255] rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-[#096754] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300">
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">El número de teléfono debe ser único</p>
+            <p *ngIf="signupForm.get('telefono')!.invalid && signupForm.get('telefono')!.touched" class="mt-1 text-xs text-red-500">Ingresar número teléfono válido</p>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label class="block text-sm font-medium text-[#096754] dark:text-white mb-2">Email</label>
+            <input
+              formControlName="correo"
+              placeholder="Digite su email"
+              type="email"
+              class="w-full px-4 py-3 bg-white dark:bg-[#1a1f2e] border-2 border-gray-200 dark:border-[#3a4255] rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-[#096754] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300">
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">El correo de usuario debe ser único</p>
+            <p *ngIf="signupForm.get('correo')!.invalid && signupForm.get('correo')!.touched" class="mt-1 text-xs text-red-500">Introduzca un correo válido</p>
+          </div>
+
+          <!-- Nombre de usuario -->
+          <div>
+            <label class="block text-sm font-medium text-[#096754] dark:text-white mb-2">Nombre de usuario</label>
+            <input
+              formControlName="username"
+              placeholder="Digite su nombre de usuario"
+              class="w-full px-4 py-3 bg-white dark:bg-[#1a1f2e] border-2 border-gray-200 dark:border-[#3a4255] rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-[#096754] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300">
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">El nombre de usuario debe ser único</p>
+            <p *ngIf="signupForm.get('username')!.invalid && signupForm.get('username')!.touched" class="mt-1 text-xs text-red-500">El nombre de usuario es requerido max. 9 caracteres</p>
+          </div>
+
+          <!-- Contraseña -->
+          <div>
+            <label class="block text-sm font-medium text-[#096754] dark:text-white mb-2">Contraseña</label>
+            <div class="relative">
+              <input
+                formControlName="password"
+                placeholder="Digite su contraseña"
+                [type]="showPassword ? 'text' : 'password'"
+                class="w-full px-4 py-3 pr-12 bg-white dark:bg-[#1a1f2e] border-2 border-gray-200 dark:border-[#3a4255] rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-[#096754] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300">
+              <button
+                type="button"
+                (click)="togglePasswordVisibility()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#096754] dark:text-gray-400 dark:hover:text-[#0a7a5e] transition-colors focus:outline-none">
+                <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+              </button>
+            </div>
+            <p *ngIf="signupForm.get('password')!.invalid && signupForm.get('password')!.touched" class="mt-1 text-xs text-red-500">La contraseña debe tener al menos 3 caracteres</p>
+          </div>
+
+          <!-- DNI -->
+          <div>
+            <label class="block text-sm font-medium text-[#096754] dark:text-white mb-2">DNI</label>
+            <input
+              formControlName="dni"
+              placeholder="Digite su DNI"
+              class="w-full px-4 py-3 bg-white dark:bg-[#1a1f2e] border-2 border-gray-200 dark:border-[#3a4255] rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-[#096754] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300">
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">El número de DNI debe ser único</p>
+            <p *ngIf="signupForm.get('dni')!.invalid && signupForm.get('dni')!.touched" class="mt-1 text-xs text-red-500">Ingresar un número de DNI válido</p>
+          </div>
+        </div>
+
+        <!-- Campo oculto para wallet address -->
+        <input type="hidden" formControlName="walletAddress">
+
+        <!-- Botón Registrar -->
+        <div class="pt-2">
+          <button
+            type="submit"
+            [disabled]="!walletConnected || signupForm.invalid"
+            class="w-full bg-[#096754] hover:bg-[#0a7a5e] disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#096754] focus:ring-offset-2 dark:focus:ring-offset-[#252d3d]">
+            Registrar
+          </button>
+          <p *ngIf="!walletConnected" class="mt-2 text-sm text-center text-red-500 dark:text-red-400">
+            Conecta tu wallet para habilitar el registro
+          </p>
+        </div>
+      </form>
     </div>
   </div>
 </div>

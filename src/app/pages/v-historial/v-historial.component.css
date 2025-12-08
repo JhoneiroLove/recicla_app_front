@@ -138,3 +138,123 @@ i {
     max-width: 100%; /* El contenedor ocupa todo el ancho */
   }
 }
+
+/* Estilos para Balance de Tokens REC */
+.balance-card {
+  background: linear-gradient(135deg, #096754 0%, #0a7a5e 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px auto;
+  max-width: 500px;
+  box-shadow: 0 8px 16px rgba(9, 103, 84, 0.3);
+  color: white;
+}
+
+.balance-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.balance-icon {
+  font-size: 32px;
+  color: #ffd700;
+}
+
+.balance-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+}
+
+.balance-body {
+  text-align: center;
+}
+
+.balance-amount {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.balance-value {
+  font-size: 48px;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.balance-label {
+  font-size: 24px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.balance-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+}
+
+.balance-wallet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: monospace;
+}
+
+.wallet-text {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Estilos para badges de estado */
+.badge-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.estado-pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.estado-pendiente i {
+  color: #f39c12;
+}
+
+.estado-aprobada {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.estado-aprobada i {
+  color: #28a745;
+}
+
+.estado-rechazada {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.estado-rechazada i {
+  color: #dc3545;
+}

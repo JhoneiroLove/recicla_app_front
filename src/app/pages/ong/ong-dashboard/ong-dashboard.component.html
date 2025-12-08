@@ -1,12 +1,5 @@
-<div class="bootstrap-wrapper">
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-md-3">
-        <app-slidebar-ong></app-slidebar-ong>
-      </div>
-      <div class="col-md-9">
-        <router-outlet></router-outlet>
-      </div>
-    </div>
-  </div>
+<app-slidebar-ong></app-slidebar-ong>
+<div class="min-h-screen pr-6 py-6 transition-all duration-300"
+     [ngClass]="(sidebarExpanded$ | async) ? 'pl-[235px]' : 'pl-[75px]'">
+  <router-outlet></router-outlet>
 </div>

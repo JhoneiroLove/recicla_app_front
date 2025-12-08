@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Recompensa } from 'src/app/Modelo/recompensa';
 import { LoginService } from 'src/app/service/login.service';
 import { RRecompensaService } from 'src/app/service/r-recompensa.service';
+import { SidebarService } from 'src/app/service/sidebar.service';
+import { Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -10,10 +13,46 @@ import Swal from 'sweetalert2';
   styleUrls: ['./ver-recompensa.component.css']
 })
 export class VerRecompensaComponent implements OnInit {
-  recompensas: Recompensa[] = []; // Si esperas un array de Recompensas
-  esParticipante: boolean = true; // Añade esta línea}
+  recompensas: Recompensa[] = [];
+  esParticipante: boolean = true;
+  mostrarModal: boolean = false;
+  mostrarModalEdicion: boolean = false;
+  recompensaForm: FormGroup;
+  editarRecompensaForm: FormGroup;
+  imagenArchivo: File | null = null;
+  imagenPreview: string | null = null;
+  imageTouched: boolean = false;
+  recompensaActual: Recompensa | null = null;
+  sidebarExpanded$: Observable<boolean>;
 
-  constructor(private recompensaService: RRecompensaService, private loginService: LoginService) { }
+  // Propiedades de paginación
+  totalElements: number = 0;
+  currentPage: number = 0;
+  pageSize: number = 8;
+  totalPages: number = 0;
+  Math = Math;
+
+  constructor(
+    private recompensaService: RRecompensaService,
+    private loginService: LoginService,
+    private fb: FormBuilder,
+    private sidebarService: SidebarService
+  ) {
+    this.sidebarExpanded$ = this.sidebarService.expanded$;
+    this.recompensaForm = this.fb.group({
+      titulo: ['', [Validators.required, Validators.maxLength(40), Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/)]],
+      descripcion: ['', [Validators.required, Validators.maxLength(30), Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/)]],
+      categoria: ['', [Validators.required, Validators.maxLength(12), Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/)]],
+      valor: [null, [Validators.required, Validators.min(1)]],
+    });
+
+    this.editarRecompensaForm = this.fb.group({
+      titulo: ['', [Validators.required, Validators.maxLength(40), Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/)]],
+      descripcion: ['', [Validators.required, Validators.maxLength(30), Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/)]],
+      categoria: ['', [Validators.required, Validators.maxLength(12), Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/)]],
+      valor: [null, [Validators.required, Validators.min(1)]],
+    });
+  }
 
   ngOnInit(): void {
     this.cargarRecompensas();
@@ -21,14 +60,24 @@ export class VerRecompensaComponent implements OnInit {
   }
 
   cargarRecompensas(): void {
-    this.recompensaService.listarRecompensa().subscribe(
-      (data: any) => { // Especifica un tipo apropiado en lugar de 'any' si es posible
-        this.recompensas = data.content; // Asegúrate de que 'data.content' es correcto según tu estructura de respuesta
+    this.recompensaService.listarRecompensa({ page: this.currentPage, size: this.pageSize }).subscribe(
+      (data: any) => {
+        this.recompensas = data.content;
+        this.totalElements = data.totalElements;
+        this.currentPage = data.number;
+        this.totalPages = data.totalPages;
       },
-      (error: any) => { // Especifica un tipo apropiado en lugar de 'any'
+      (error: any) => {
         console.error('Error al obtener recompensas', error);
       }
     );
+  }
+
+  cambiarPagina(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.cargarRecompensas();
+    }
   }
   canjearRecompensa(nombreRecompensa: string): void {
     this.recompensaService.canjearRecompensa(nombreRecompensa).subscribe(
@@ -95,6 +144,49 @@ export class VerRecompensaComponent implements OnInit {
   }
 
   editarRecompensa(recompensa: Recompensa): void {
+    this.recompensaActual = recompensa;
+    this.editarRecompensaForm.patchValue({
+      titulo: recompensa.titulo,
+      descripcion: recompensa.descripcion,
+      categoria: recompensa.categoria,
+      valor: recompensa.valor
+    });
+    this.mostrarModalEdicion = true;
+  }
+
+  cerrarModalEdicion(): void {
+    this.mostrarModalEdicion = false;
+    this.editarRecompensaForm.reset();
+    this.recompensaActual = null;
+  }
+
+  onSubmitEditar(): void {
+    if (this.editarRecompensaForm.valid && this.recompensaActual) {
+      const titulo = this.editarRecompensaForm.get('titulo')!.value;
+      const descripcion = this.editarRecompensaForm.get('descripcion')!.value;
+
+      // Verificar duplicados
+      const recompensaDuplicada = this.verificarDuplicado(titulo, descripcion, this.recompensaActual.id);
+      if (recompensaDuplicada) {
+        Swal.fire('Error', 'Ya existe otra recompensa con el mismo título o descripción.', 'error');
+        return;
+      }
+
+      const recompensaActualizada = {
+        ...this.recompensaActual,
+        titulo: this.editarRecompensaForm.get('titulo')!.value,
+        descripcion: this.editarRecompensaForm.get('descripcion')!.value,
+        categoria: this.editarRecompensaForm.get('categoria')!.value,
+        valor: this.editarRecompensaForm.get('valor')!.value
+      };
+
+      this.actualizarRecompensa(recompensaActualizada);
+      this.cerrarModalEdicion();
+    }
+  }
+
+  // Método anterior mantenido como comentario por si se necesita
+  /*editarRecompensaOld(recompensa: Recompensa): void {
     Swal.fire({
       title: 'Editar Recompensa',
       html: `
@@ -164,7 +256,7 @@ export class VerRecompensaComponent implements OnInit {
         this.actualizarRecompensa(recompensaActualizada);
       }
     });
-  }
+  }*/
 
 // Función para verificar si hay recompensas duplicadas al editar
   verificarDuplicado(titulo: string, descripcion: string, id: number): boolean {
@@ -190,5 +282,84 @@ export class VerRecompensaComponent implements OnInit {
     );
   }
 
+  // Métodos del modal
+  abrirModalRegistro(): void {
+    this.mostrarModal = true;
+  }
 
+  cerrarModal(): void {
+    this.mostrarModal = false;
+    this.onReset();
+  }
+
+  onFileSelected(event: Event): void {
+    this.imageTouched = true;
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length) {
+      this.imagenArchivo = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagenPreview = e.target.result;
+      };
+      reader.readAsDataURL(this.imagenArchivo);
+    }
+  }
+
+  removeImage(): void {
+    this.imagenArchivo = null;
+    this.imagenPreview = null;
+    this.imageTouched = false;
+  }
+
+  onSubmit(): void {
+    const titulo = this.recompensaForm.value.titulo;
+    const descripcion = this.recompensaForm.value.descripcion;
+
+    // Verifica si ya existe una recompensa con el mismo título o descripción
+    const recompensaDuplicada = this.verificarDuplicadoRegistro(titulo, descripcion);
+
+    if (recompensaDuplicada) {
+      Swal.fire('Error', 'Ya existe una recompensa con el mismo título o descripción.', 'error');
+      return;
+    }
+
+    if (this.recompensaForm.valid && this.imagenArchivo) {
+      const formData = new FormData();
+      formData.append('titulo', this.recompensaForm.value.titulo);
+      formData.append('descripcion', this.recompensaForm.value.descripcion);
+      formData.append('categoria', this.recompensaForm.value.categoria);
+      formData.append('valor', this.recompensaForm.value.valor);
+      formData.append('imagenPath', this.imagenArchivo);
+
+      this.recompensaService.registrarRecompensa(formData).subscribe(
+        response => {
+          Swal.fire('¡Éxito!', 'Recompensa registrada correctamente', 'success');
+          this.cerrarModal();
+          this.cargarRecompensas();
+        },
+        error => {
+          console.error(error);
+          Swal.fire('Error', 'La imagen excede los límites de tamaño (5mb)', 'error');
+        }
+      );
+    } else {
+      this.imageTouched = true;
+      Swal.fire('Error', 'Por favor completa todos los campos y sube una imagen', 'error');
+    }
+  }
+
+  verificarDuplicadoRegistro(titulo: string, descripcion: string): boolean {
+    return this.recompensas.some(
+      recompensa =>
+        recompensa.titulo.toLowerCase() === titulo.toLowerCase() ||
+        recompensa.descripcion.toLowerCase() === descripcion.toLowerCase()
+    );
+  }
+
+  onReset(): void {
+    this.recompensaForm.reset();
+    this.imagenArchivo = null;
+    this.imagenPreview = null;
+    this.imageTouched = false;
+  }
 }

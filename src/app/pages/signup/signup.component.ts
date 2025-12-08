@@ -16,6 +16,7 @@ export class SignupComponent implements OnInit, OnDestroy {
   walletAddress: string = '';
   isConnectingWallet: boolean = false;
   walletConnected: boolean = false;
+  showPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -24,6 +25,10 @@ export class SignupComponent implements OnInit, OnDestroy {
     private snack: MatSnackBar,
     private router: Router
   ) {}
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   ngOnInit(): void {
     this.signupForm = this.fb.group({

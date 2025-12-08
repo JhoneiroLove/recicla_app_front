@@ -1,125 +1,229 @@
-<div class="container">
-  <h2 class="text-center">Historial de Actividad</h2>
-
-  <div class="container-2">
-    <div *ngIf="actividades.data.length === 0" class="text-center no-actividades">
-      <p>Parece que todavía no has registrado una actividad, ¡comienza a reciclar para ganar puntos!</p>
-      <img src="/assets/símbolo-de-reciclaje.jpg" alt="simbolo" class="imagen-reciclaje">
+<!-- Header -->
+<div class="mb-8">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-[#096754] rounded-lg flex items-center justify-center">
+        <i class="fa-solid fa-clock-rotate-left text-white text-lg"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Historial de Actividad</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Registro completo de tus actividades de reciclaje</p>
+      </div>
     </div>
 
-  <!-- Filtros y opciones de exportación solo si hay actividades -->
-  <div *ngIf="actividades.data.length > 0">
-    <!-- Filtro desplegable -->
-    <div class="col-12 mb-3">
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Filtrar historial
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        <div class="filter-container">
-          <!-- Campo de búsqueda para filtrar por nombre de actividad -->
-          <mat-form-field class="filter-item">
-            <mat-label>Buscar por Nombre de la Actividad</mat-label>
-            <input matInput (keyup)="applyFilter($event)" placeholder="Buscar actividad">
-          </mat-form-field>
-
-          <!-- Desplegable para seleccionar el tipo de residuo -->
-          <mat-form-field class="filter-item">
-            <mat-label>Filtrar por Tipo de Residuo</mat-label>
-            <mat-select (selectionChange)="applyResiduoFilter($event)">
-              <mat-option value="">Todos</mat-option> <!-- Opción para mostrar todas las actividades -->
-              <mat-option *ngFor="let residuo of residuosDisponibles" [value]="residuo">
-                {{ residuo }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <!-- Desplegable para ordenar por cantidad de residuo -->
-          <mat-form-field class="filter-item">
-            <mat-label>Ordenar por Cantidad</mat-label>
-            <mat-select (selectionChange)="applyCantidadSort($event)">
-              <mat-option value="todos">Todos</mat-option> <!-- Opción para volver al estado original -->
-              <mat-option value="mayorMenor">Mayor a menor</mat-option>
-              <mat-option value="menorMayor">Menor a mayor</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      </mat-expansion-panel>
-    </div>
-
-    <!-- Opciones de exportación -->
-    <div class="col-12 text-right mb-3">
-      <p><strong>Opciones de guardado:</strong></p> <!-- Texto de opciones de guardado -->
-      <button mat-raised-button (click)="exportarPDF()" class="btn-export pdf">
-        <i class="fa fa-file-pdf"></i> Exportar PDF
+    <!-- Botones de exportación -->
+    <div *ngIf="actividades.data.length > 0" class="flex gap-3">
+      <button (click)="exportarPDF()"
+              class="flex items-center gap-2 px-4 py-2.5 bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-medium shadow-sm hover:shadow-md">
+        <i class="fa-solid fa-file-pdf text-white"></i>
+        <span class="hidden sm:inline text-white">Exportar PDF</span>
       </button>
-      <button mat-raised-button (click)="exportarCSV()" class="btn-export csv">
-        <i class="fa fa-file-csv"></i> Exportar CSV
+      <button (click)="exportarCSV()"
+              class="flex items-center gap-2 px-4 py-2.5 bg-green-600 rounded-lg hover:bg-green-700 transition-colors font-medium shadow-sm hover:shadow-md">
+        <i class="fa-solid fa-file-csv text-white"></i>
+        <span class="hidden sm:inline text-white">Exportar CSV</span>
       </button>
     </div>
-
-
-
-  <!-- Tabla de actividades -->
-  <div class="col-12">
-    <table mat-table [dataSource]="actividades" class="tabla">
-
-      <!-- Columna Nombre -->
-      <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef> Nombre </th>
-        <td mat-cell *matCellDef="let actividad"> {{ actividad.nombre }} </td>
-      </ng-container>
-
-      <!-- Columna Cantidad -->
-      <ng-container matColumnDef="cantidad">
-        <th mat-header-cell *matHeaderCellDef> Cantidad </th>
-        <td mat-cell *matCellDef="let actividad"> {{ actividad.cantidad }} </td>
-      </ng-container>
-
-      <!-- Columna Residuo -->
-      <ng-container matColumnDef="residuo">
-        <th mat-header-cell *matHeaderCellDef> Residuo </th>
-        <td mat-cell *matCellDef="let actividad"> {{ actividad.residuoNombre }} </td>
-      </ng-container>
-
-      <!-- Columna Puntos Ganados -->
-      <ng-container matColumnDef="puntosGanados">
-        <th mat-header-cell *matHeaderCellDef> Puntos Ganados </th>
-        <td mat-cell *matCellDef="let actividad"> {{ actividad.puntosGanados }} </td>
-      </ng-container>
-
-      <!-- Columna Fecha -->
-      <ng-container matColumnDef="fecha">
-        <th mat-header-cell *matHeaderCellDef> Fecha </th>
-        <td mat-cell *matCellDef="let actividad"> {{ actividad.fecha | date: 'medium' }} </td>
-      </ng-container>
-
-      <!-- Columna Imagen -->
-      <ng-container matColumnDef="imagen">
-        <th mat-header-cell *matHeaderCellDef> Imagen </th>
-        <td mat-cell *matCellDef="let actividad">
-          <img [src]="'data:image/jpeg;base64,' + actividad.imagen" alt="Imagen de la actividad" class="actividad-imagen">
-        </td>
-      </ng-container>
-
-      <!-- Columna Compartir -->
-      <ng-container matColumnDef="compartir">
-        <th mat-header-cell *matHeaderCellDef> Compartir </th>
-        <td mat-cell *matCellDef="let actividad">
-          <button mat-icon-button (click)="mostrarQR(actividad.id)">
-            <i class="fa-solid fa-share"></i>
-          </button>
-        </td>
-      </ng-container>
-
-      <!-- Encabezados de Columnas -->
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <!-- Filas de Datos -->
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
   </div>
+</div>
+
+<!-- Card de Balance de Tokens REC -->
+<div *ngIf="walletAddress" class="bg-gradient-to-br from-[#096754] to-[#0a7a5e] rounded-2xl shadow-lg p-6 mb-8 text-white">
+  <div class="flex items-center gap-3 mb-4">
+    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+      <i class="fa-solid fa-coins text-2xl"></i>
+    </div>
+    <h3 class="text-xl font-semibold">Balance de Tokens REC</h3>
+  </div>
+  <div class="flex items-center justify-between">
+    <div *ngIf="!cargandoBalance" class="flex items-baseline gap-2">
+      <span class="text-5xl font-bold">{{ balanceREC | number:'1.2-2' }}</span>
+      <span class="text-xl font-medium opacity-90">REC</span>
+    </div>
+    <div *ngIf="cargandoBalance" class="flex items-center gap-3">
+      <mat-spinner diameter="30" class="!text-white"></mat-spinner>
+      <span class="text-lg">Cargando balance...</span>
+    </div>
+    <div class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
+      <i class="fa-solid fa-wallet"></i>
+      <span class="font-mono text-sm">{{ walletAddress | slice:0:6 }}...{{ walletAddress | slice:-4 }}</span>
+    </div>
+  </div>
+</div>
+
+<div>
+  <!-- Mensaje cuando no hay actividades -->
+  <div *ngIf="actividades.data.length === 0" class="bg-white dark:bg-[#252d3d] rounded-2xl shadow-lg p-12 text-center">
+    <i class="fa-solid fa-inbox text-gray-300 dark:text-gray-600 text-6xl mb-4"></i>
+    <p class="text-gray-600 dark:text-gray-400 text-lg mb-4">Parece que todavía no has registrado una actividad</p>
+    <p class="text-gray-500 dark:text-gray-500 text-sm">¡Comienza a reciclar para ganar puntos!</p>
+    <img src="/assets/símbolo-de-reciclaje.jpg" alt="simbolo" class="mx-auto mt-6 w-32 h-32 opacity-50 rounded-lg">
+  </div>
+
+  <!-- Filtros y Tabla -->
+  <div *ngIf="actividades.data.length > 0" class="space-y-6">
+    <!-- Panel de Filtros -->
+    <div class="bg-white dark:bg-[#252d3d] rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 p-6">
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Buscar por nombre -->
+        <div class="flex-1 max-w-xl">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Buscar
+          </label>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="text"
+                   (keyup)="applyFilter($event)"
+                   placeholder="Buscar actividad..."
+                   class="w-full pl-11 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors placeholder-gray-400">
+          </div>
+        </div>
+
+        <!-- Filtrar por tipo de residuo -->
+        <div class="w-full md:w-64">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Tipo de Residuo
+          </label>
+          <select (change)="applyResiduoFilter($event)"
+                  class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+            <option value="">Todos</option>
+            <option *ngFor="let residuo of residuosDisponibles" [value]="residuo">
+              {{ residuo }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="bg-white dark:bg-[#252d3d] rounded-2xl shadow-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="actividades" class="w-full">
+
+          <!-- Columna Nombre -->
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              Nombre
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200">
+              {{ actividad.nombre }}
+            </td>
+          </ng-container>
+
+          <!-- Columna Cantidad -->
+          <ng-container matColumnDef="cantidad">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold !text-center">
+              <div class="flex items-center justify-center gap-2">
+                <span>Cantidad (kg)</span>
+                <button (click)="toggleOrdenCantidad()"
+                        class="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors">
+                  <i class="fa-solid text-sm"
+                     [ngClass]="{
+                       'fa-arrow-down-short-wide text-[#096754]': ordenCantidad === 'mayorMenor',
+                       'fa-arrow-up-short-wide text-[#096754]': ordenCantidad === 'menorMayor',
+                       'fa-sort text-gray-400': ordenCantidad === 'todos' || ordenCantidad === ''
+                     }"></i>
+                </button>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200 !text-center">
+              <span class="inline-flex items-center justify-center gap-1">
+                <i class="fa-solid fa-weight-scale text-[#096754]"></i>
+                {{ actividad.cantidad }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Columna Residuo -->
+          <ng-container matColumnDef="residuo">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              Tipo de Residuo
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200">
+              <span class="inline-flex items-center gap-2 px-3 py-1 bg-[#096754]/10 text-[#096754] dark:bg-[#096754]/20 dark:text-[#0a7a5e] rounded-full text-sm font-medium">
+                <i class="fa-solid fa-recycle"></i>
+                {{ actividad.residuoNombre }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Columna Puntos Ganados -->
+          <ng-container matColumnDef="puntosGanados">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              Puntos
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200">
+              <span class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-semibold">
+                <i class="fa-solid fa-star"></i>
+                {{ actividad.puntosGanados }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Columna Estado -->
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              Estado
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200">
+              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium"
+                    [ngClass]="{
+                      'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400': actividad.estado?.toUpperCase() === 'APROBADA',
+                      'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400': actividad.estado?.toUpperCase() === 'RECHAZADA',
+                      'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400': !actividad.estado || actividad.estado?.toUpperCase() === 'PENDIENTE'
+                    }">
+                <i class="fa-solid" [ngClass]="obtenerIconoEstado(actividad.estado)"></i>
+                {{ actividad.estado || 'PENDIENTE' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Columna Fecha -->
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              Fecha
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-600 dark:!text-gray-400 text-sm">
+              <span class="inline-flex items-center gap-1">
+                <i class="fa-solid fa-calendar"></i>
+                {{ actividad.fecha | date: 'short' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Columna Imagen -->
+          <ng-container matColumnDef="imagen">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold !text-center">
+              Evidencia
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200 !text-center">
+              <div class="flex justify-center">
+                <img [src]="'data:image/jpeg;base64,' + actividad.imagen"
+                     alt="Evidencia"
+                     class="w-16 h-16 rounded-lg object-cover shadow-sm hover:scale-110 transition-transform cursor-pointer">
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Columna Compartir -->
+          <ng-container matColumnDef="compartir">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              Acciones
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200">
+              <button (click)="mostrarQR(actividad.id)"
+                      class="p-2 text-[#096754] dark:text-[#0a7a5e] hover:bg-[#096754]/10 dark:hover:bg-[#096754]/20 rounded-lg transition-colors">
+                <i class="fa-solid fa-share-nodes text-lg"></i>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              class="hover:bg-gray-50 dark:hover:bg-[#1a1f2e] transition-colors"></tr>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 

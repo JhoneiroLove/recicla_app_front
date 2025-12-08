@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ResiduoService } from '../../../app/service/residuo.service';
+import { SidebarService } from '../../../app/service/sidebar.service';
+import { Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -11,8 +14,14 @@ import Swal from 'sweetalert2';
 export class RResiduoComponent implements OnInit {
   residuoForm: FormGroup;
   residuosExistentes: any[] = [];  // Para almacenar residuos existentes
+  sidebarExpanded$: Observable<boolean>;
 
-  constructor(private residuoService: ResiduoService) {
+  constructor(
+    private residuoService: ResiduoService,
+    private sidebarService: SidebarService,
+    private router: Router
+  ) {
+    this.sidebarExpanded$ = this.sidebarService.expanded$;
     this.residuoForm = new FormGroup({
       nombre: new FormControl('', [
         Validators.required,
@@ -119,6 +128,10 @@ export class RResiduoComponent implements OnInit {
   }
 
   onReset(): void {
-    this.residuoForm.reset();  // Restablece el formulario a su estado original
+    this.residuoForm.reset();
+  }
+
+  volver(): void {
+    this.router.navigate(['/admin/ver-residuo']);
   }
 }

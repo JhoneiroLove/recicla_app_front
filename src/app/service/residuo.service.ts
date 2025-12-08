@@ -29,4 +29,12 @@ export class ResiduoService {
   public deleteResiduoById(id: number): Observable<any> {
     return this.httpClient.delete(`${baserUrl}/residuo/${id}`);
   }
+
+  public listarResiduos(): Observable<any> {
+    return this.httpClient.get(`${baserUrl}/residuo/listar-residuos`);
+  }
+
+  public listarResiduosPublico(): Observable<any> {
+    return this.httpClient.get(`${baserUrl}/residuo/`);
+  }
 }

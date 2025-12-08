@@ -6,27 +6,36 @@ import { Observable } from "rxjs";
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private loginService: LoginService) {
-  }
+  constructor(private loginService: LoginService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    let authReq = req;
     const token = this.loginService.getToken();
-    console.log("JWT Token: ", token); // Agrega esta línea para depurar
-    if (token != null) {
-      authReq = authReq.clone({
-        setHeaders: { Authorization: `Bearer ${token}` }
+
+    console.log('🔐 INTERCEPTOR:', {
+      url: req.url,
+      hasToken: !!token,
+      tokenLength: token?.length || 0
+    });
+
+    if (token) {
+      const authReq = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
       });
+      console.log('✅ Header Authorization agregado');
+      return next.handle(authReq);
     }
-    return next.handle(authReq);
+
+    console.warn('⚠️ NO hay token, request sin autenticación');
+    return next.handle(req);
   }
-  
 }
 
 export const authInterceptorProviders = [
   {
-    provide : HTTP_INTERCEPTORS,
-    useClass : AuthInterceptor,
-    multi : true
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthInterceptor,
+    multi: true
   }
-]
+];

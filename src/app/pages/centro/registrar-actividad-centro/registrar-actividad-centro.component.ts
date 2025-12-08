@@ -14,8 +14,12 @@ import { Residuo } from '../../../Modelo/residuo';
 export class RegistrarActividadCentroComponent implements OnInit {
   actividadForm: FormGroup;
   imagenArchivo: File | null = null;
+  imagenPreview: string | null = null;
+  qrArchivo: File | null = null;
+  qrPreview: string | null = null;
   imageTouched: boolean = false;
   residuos: Residuo[] = [];
+  showInstructions: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -23,6 +27,8 @@ export class RegistrarActividadCentroComponent implements OnInit {
     private residuoService: ResiduoService,
     private snack: MatSnackBar
   ) {
+    console.log('🔧 Constructor ejecutándose');
+    console.log('ResiduoService:', this.residuoService);
     this.actividadForm = this.fb.group({
       walletEstudiante: [
         '',
@@ -41,19 +47,35 @@ export class RegistrarActividadCentroComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('🚀 ngOnInit - Iniciando carga de residuos');
+    console.log('Estado inicial residuos:', this.residuos);
     this.cargarResiduos();
   }
 
   cargarResiduos(): void {
-    this.residuoService.getAllResiduos({}).subscribe(
+    console.log('cargarResiduos - Probando endpoint público');
+    this.residuoService.listarResiduosPublico().subscribe(
       (data) => {
-        this.residuos = data.content;
+        console.log('✅ Respuesta del servidor (público):', data);
+        this.residuos = Array.isArray(data) ? data : (data.content || []);
+        console.log('Residuos asignados:', this.residuos);
       },
       (error) => {
-        console.log(error);
-        this.snack.open('Error al cargar los residuos', 'Aceptar', {
-          duration: 3000,
-        });
+        console.error('❌ Error con endpoint público, intentando con paginación...');
+        // Si falla el público, intenta con el de paginación
+        this.residuoService.getAllResiduos({ page: 0, size: 1000 }).subscribe(
+          (data) => {
+            console.log('✅ Respuesta con paginación:', data);
+            this.residuos = data.content || [];
+            console.log('Residuos asignados:', this.residuos);
+          },
+          (error2) => {
+            console.error('❌ Error al cargar residuos:', error2);
+            this.snack.open('No se pudieron cargar los residuos. Verifica tu sesión.', 'Aceptar', {
+              duration: 3000,
+            });
+          }
+        );
       }
     );
   }
@@ -63,7 +85,39 @@ export class RegistrarActividadCentroComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
       this.imagenArchivo = input.files[0];
+
+      // Crear vista previa
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagenPreview = e.target.result;
+      };
+      reader.readAsDataURL(this.imagenArchivo);
     }
+  }
+
+  removeImage(): void {
+    this.imagenArchivo = null;
+    this.imagenPreview = null;
+    this.imageTouched = false;
+  }
+
+  onQRFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length) {
+      this.qrArchivo = input.files[0];
+
+      // Crear vista previa
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.qrPreview = e.target.result;
+      };
+      reader.readAsDataURL(this.qrArchivo);
+    }
+  }
+
+  removeQR(): void {
+    this.qrArchivo = null;
+    this.qrPreview = null;
   }
 
   escanearQR(): void {
@@ -84,6 +138,11 @@ export class RegistrarActividadCentroComponent implements OnInit {
       formData.append('cantidad', this.actividadForm.value.cantidad.toString());
       formData.append('nombreResiduo', this.actividadForm.value.nombreResiduo);
       formData.append('image', this.imagenArchivo);
+
+      // Agregar foto del QR si existe
+      if (this.qrArchivo) {
+        formData.append('qrImage', this.qrArchivo);
+      }
 
       Swal.fire({
         title: 'Registrando actividad...',
@@ -132,6 +191,17 @@ export class RegistrarActividadCentroComponent implements OnInit {
   onReset(): void {
     this.actividadForm.reset();
     this.imagenArchivo = null;
+    this.imagenPreview = null;
+    this.qrArchivo = null;
+    this.qrPreview = null;
     this.imageTouched = false;
+  }
+
+  openInstructions(): void {
+    this.showInstructions = true;
+  }
+
+  closeInstructions(): void {
+    this.showInstructions = false;
   }
 }

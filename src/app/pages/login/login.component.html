@@ -1,36 +1,67 @@
-<div class="bootstrap-wrapper mb-4">
-    <div class="container">
-        <div class="row mt20">
-            <div class="col-md-6 offset-md-3">
-                <mat-card>
-                    <div class="container text-center">
-                        <img src="../../../assets/login.png" width="100" height="100">
-                    </div>
-
-                    <h1 class="text-center">Iniciar sesión</h1>
-
-                    <!-- Agregado el atributo (ngSubmit) -->
-                    <form (ngSubmit)="formSubmit()">
-                        <mat-form-field class="full-width" appearance="outline">
-                            <mat-label>Nombre de usuario</mat-label>
-                            <!-- Agregado el atributo [(ngModel)] para el nombre de usuario -->
-                            <input [(ngModel)]="loginData.username" name="username" required matInput placeholder="Digite su nombre de usuario">
-                            <mat-hint>El nombre de usuario debe ser válido</mat-hint>
-                        </mat-form-field>
-
-                        <mat-form-field class="full-width" appearance="outline">
-                            <mat-label>Contraseña</mat-label>
-                            <!-- Agregado el atributo [(ngModel)] para la contraseña -->
-                            <input [(ngModel)]="loginData.password" name="password" required type="password" matInput placeholder="Digite su contraseña">
-                            <mat-hint>La contraseña debe ser válida</mat-hint>
-                        </mat-form-field>
-
-                        <div class="container text-center mb-4">
-                          <button type="submit" mat-raised-button>Ingresar</button>
-                        </div>
-                    </form>
-                </mat-card>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:bg-[#1a1f2e] py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full">
+        <div class="bg-white dark:bg-[#252d3d] rounded-xl shadow-lg dark:shadow-xl p-8">
+            <!-- Logo -->
+            <div class="flex justify-center mb-6">
+                <img src="../../../assets/login.png" width="100" height="100" class="rounded-full" alt="Login">
             </div>
+
+            <!-- Título -->
+            <h1 class="text-3xl font-bold text-center text-[#096754] dark:text-white mb-8">
+                Iniciar sesión
+            </h1>
+
+            <!-- Formulario -->
+            <form (ngSubmit)="formSubmit()" class="space-y-6">
+                <!-- Campo Usuario -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-[#096754] dark:text-white mb-2">
+                        Nombre de usuario
+                    </label>
+                    <input
+                        [(ngModel)]="loginData.username"
+                        name="username"
+                        id="username"
+                        required
+                        type="text"
+                        placeholder="Digite su nombre de usuario"
+                        class="w-full px-4 py-3 bg-white dark:bg-[#1a1f2e] border-2 border-gray-200 dark:border-[#3a4255] rounded-lg focus:ring-2 focus:ring-[#096754] dark:focus:ring-[#096754] focus:border-[#096754] dark:focus:border-[#096754] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300">
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-300">El nombre de usuario debe ser válido</p>
+                </div>
+
+                <!-- Campo Contraseña -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-[#096754] dark:text-white mb-2">
+                        Contraseña
+                    </label>
+                    <div class="relative">
+                        <input
+                            [(ngModel)]="loginData.password"
+                            name="password"
+                            id="password"
+                            required
+                            [type]="showPassword ? 'text' : 'password'"
+                            placeholder="Digite su contraseña"
+                            class="w-full px-4 py-3 pr-12 bg-white dark:bg-[#1a1f2e] border-2 border-gray-200 dark:border-[#3a4255] rounded-lg focus:ring-2 focus:ring-[#096754] dark:focus:ring-[#096754] focus:border-[#096754] dark:focus:border-[#096754] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300">
+                        <button
+                            type="button"
+                            (click)="togglePasswordVisibility()"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#096754] dark:text-gray-400 dark:hover:text-[#0a7a5e] transition-colors focus:outline-none">
+                            <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-300">La contraseña debe ser válida</p>
+                </div>
+
+                <!-- Botón Ingresar -->
+                <div class="pt-4">
+                    <button
+                        type="submit"
+                        class="w-full bg-[#096754] hover:bg-[#0a7a5e] text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#096754] focus:ring-offset-2 dark:focus:ring-offset-[#252d3d]">
+                        Ingresar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

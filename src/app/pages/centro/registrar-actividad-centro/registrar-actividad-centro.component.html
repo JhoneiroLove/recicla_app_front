@@ -1,108 +1,171 @@
-<div class="registro-container">
-    <mat-card>
-        <mat-card-header>
-            <mat-card-title>📦 Registrar Entrega de Reciclaje</mat-card-title>
-            <mat-card-subtitle>Centro de Acopio UPAO</mat-card-subtitle>
-        </mat-card-header>
+<div class="max-w-3xl mx-auto p-6">
+    <div class="bg-white dark:bg-[#252d3d] rounded-2xl shadow-lg">
+        <!-- Header -->
+        <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-white">📦 Registrar Entrega de Reciclaje</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Centro de Acopio UPAO</p>
+            </div>
+            <button (click)="openInstructions()"
+                    class="text-[#096754] hover:text-[#0a7a5e] transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fa-solid fa-circle-question text-2xl"></i>
+            </button>
+        </div>
 
-        <mat-card-content>
-            <form [formGroup]="actividadForm" (ngSubmit)="submitForm()">
+        <!-- Body -->
+        <div class="p-6">
+            <form [formGroup]="actividadForm" (ngSubmit)="submitForm()" class="space-y-4">
 
                 <!-- Wallet del Estudiante -->
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Wallet del Estudiante</mat-label>
-                    <input matInput formControlName="walletEstudiante" placeholder="0x...">
-                    <button mat-icon-button matSuffix (click)="escanearQR()" type="button" matTooltip="Escanear QR">
-                        <mat-icon>qr_code_scanner</mat-icon>
-                    </button>
-                    <mat-error *ngIf="actividadForm.get('walletEstudiante')?.hasError('required')">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Wallet del Estudiante
+                    </label>
+                    <div class="relative">
+                        <input type="text" formControlName="walletEstudiante"
+                               placeholder="0x..."
+                               class="w-full px-4 py-2.5 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+                        <button type="button" (click)="escanearQR()"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 text-[#096754] hover:text-[#0a7a5e] p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <i class="fa-solid fa-qrcode text-lg"></i>
+                        </button>
+                    </div>
+                    <p *ngIf="actividadForm.get('walletEstudiante')?.hasError('required') && actividadForm.get('walletEstudiante')?.touched"
+                       class="mt-1 text-sm text-red-500">
                         La wallet es requerida
-                    </mat-error>
-                    <mat-error *ngIf="actividadForm.get('walletEstudiante')?.hasError('pattern')">
+                    </p>
+                    <p *ngIf="actividadForm.get('walletEstudiante')?.hasError('pattern') && actividadForm.get('walletEstudiante')?.touched"
+                       class="mt-1 text-sm text-red-500">
                         Formato de wallet inválido (debe empezar con 0x)
-                    </mat-error>
-                </mat-form-field>
+                    </p>
+                </div>
 
-                <!-- Tipo de Material -->
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Tipo de Material</mat-label>
-                    <mat-select formControlName="nombreResiduo">
-                        <mat-option *ngFor="let residuo of residuos" [value]="residuo.nombre">
-                            {{ residuo.nombre }} - {{ residuo.puntos }} puntos/kg
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="actividadForm.get('nombreResiduo')?.hasError('required')">
-                        Selecciona un tipo de material
-                    </mat-error>
-                </mat-form-field>
+                <!-- Tipo de Material y Peso -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Tipo de Material -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Tipo de Material ({{ residuos.length }} disponibles)
+                        </label>
+                        <select formControlName="nombreResiduo"
+                                class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+                            <option value="" disabled selected>Selecciona un material</option>
+                            <option *ngFor="let residuo of residuos" [value]="residuo.nombre">
+                                {{ residuo.nombre }}
+                            </option>
+                        </select>
+                        <p *ngIf="actividadForm.get('nombreResiduo')?.hasError('required') && actividadForm.get('nombreResiduo')?.touched"
+                           class="mt-1 text-sm text-red-500">
+                            Selecciona un tipo de material
+                        </p>
+                    </div>
 
-                <!-- Cantidad en kg -->
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Peso (kg)</mat-label>
-                    <input matInput type="number" formControlName="cantidad" placeholder="0.0" step="0.1">
-                    <mat-icon matSuffix>scale</mat-icon>
-                    <mat-error *ngIf="actividadForm.get('cantidad')?.hasError('required')">
-                        El peso es requerido
-                    </mat-error>
-                    <mat-error *ngIf="actividadForm.get('cantidad')?.hasError('min')">
-                        El peso mínimo es 0.1 kg
-                    </mat-error>
-                </mat-form-field>
+                    <!-- Peso -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Peso (kg)
+                        </label>
+                        <div class="relative">
+                            <input type="number" formControlName="cantidad"
+                                   placeholder="0.0" step="0.1"
+                                   class="w-full px-4 py-2.5 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+                            <i class="fa-solid fa-weight-scale absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <p *ngIf="actividadForm.get('cantidad')?.hasError('required') && actividadForm.get('cantidad')?.touched"
+                           class="mt-1 text-sm text-red-500">
+                            El peso es requerido
+                        </p>
+                        <p *ngIf="actividadForm.get('cantidad')?.hasError('min') && actividadForm.get('cantidad')?.touched"
+                           class="mt-1 text-sm text-red-500">
+                            El peso mínimo es 0.1 kg
+                        </p>
+                    </div>
+                </div>
 
                 <!-- Evidencia Fotográfica -->
-                <div class="upload-section">
-                    <label class="upload-label">📸 Evidencia Fotográfica</label>
-                    <input type="file" (change)="onFileSelected($event)" accept="image/*" #fileInput class="file-input">
-                    <button mat-raised-button color="accent" type="button" (click)="fileInput.click()">
-                        <mat-icon>add_a_photo</mat-icon>
-                        Seleccionar Imagen
-                    </button>
-                    <span *ngIf="imagenArchivo" class="file-name">{{ imagenArchivo.name }}</span>
-                    <mat-error *ngIf="imageTouched && !imagenArchivo" class="error-message">
-                        La imagen es requerida
-                    </mat-error>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        📸 Evidencia Fotográfica
+                    </label>
+                    <input type="file" (change)="onFileSelected($event)" accept="image/*" #fileInput class="hidden">
+
+                    <div *ngIf="!imagenArchivo"
+                         (click)="fileInput.click()"
+                         class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-[#096754] dark:hover:border-[#0a7a5e] transition-colors bg-gray-50 dark:bg-[#1a1f2e]">
+                        <i class="fa-solid fa-camera text-4xl text-gray-400 mb-3"></i>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">Haz clic para seleccionar una imagen</p>
+                        <button type="button" (click)="fileInput.click()"
+                                class="px-5 py-2.5 bg-[#096754] hover:bg-[#0a7a5e] text-white rounded-lg transition-colors text-sm font-medium">
+                            Seleccionar Imagen
+                        </button>
+                        <p *ngIf="imageTouched && !imagenArchivo" class="mt-2 text-sm text-red-500">
+                            La imagen es requerida
+                        </p>
+                    </div>
+
+                    <div *ngIf="imagenArchivo" class="relative rounded-lg overflow-hidden max-w-sm mx-auto">
+                        <img [src]="imagenPreview" alt="Vista previa" class="w-full h-64 object-cover">
+                        <button type="button" (click)="removeImage()"
+                                class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Botones -->
-                <div class="button-container">
-                    <button mat-raised-button color="primary" type="submit"
-                        [disabled]="!actividadForm.valid || !imagenArchivo">
-                        <mat-icon>check_circle</mat-icon>
-                        Registrar Actividad
-                    </button>
-                    <button mat-raised-button color="warn" type="button" (click)="onReset()">
-                        <mat-icon>cancel</mat-icon>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" (click)="onReset()"
+                            class="flex-1 px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium">
+                        <i class="fa-solid fa-rotate-right mr-2 text-xs"></i>
                         Limpiar
+                    </button>
+                    <button type="submit" [disabled]="!actividadForm.valid || !imagenArchivo"
+                            class="flex-1 px-5 py-2.5 bg-[#096754] hover:bg-[#0a7a5e] text-white rounded-lg transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-check-circle mr-2 text-xs"></i>
+                        Registrar Actividad
                     </button>
                 </div>
             </form>
-        </mat-card-content>
-    </mat-card>
+        </div>
+    </div>
+</div>
 
-    <!-- Instrucciones -->
-    <mat-card class="instrucciones-card">
-        <mat-card-header>
-            <mat-card-title>📋 Instrucciones</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <ol>
-                <li>Pesa el material reciclado del estudiante</li>
-                <li>Escanea el código QR de la wallet del estudiante</li>
-                <li>Selecciona el tipo de material entregado</li>
-                <li>Ingresa el peso medido en la balanza</li>
-                <li>Toma fotografías de:
-                    <ul>
+<!-- Modal de Instrucciones -->
+<div *ngIf="showInstructions" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" (click)="closeInstructions()">
+    <div class="bg-white dark:bg-[#252d3d] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" (click)="$event.stopPropagation()">
+        <!-- Header del modal -->
+        <div class="sticky top-0 bg-white dark:bg-[#252d3d] border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">📋 Instrucciones</h2>
+            <button (click)="closeInstructions()" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Body del modal -->
+        <div class="p-6">
+            <ol class="space-y-3 text-gray-700 dark:text-gray-300 list-decimal list-inside">
+                <li class="text-sm">Pesa el material reciclado del estudiante</li>
+                <li class="text-sm">Escanea el código QR de la wallet del estudiante</li>
+                <li class="text-sm">Selecciona el tipo de material entregado</li>
+                <li class="text-sm">Ingresa el peso medido en la balanza</li>
+                <li class="text-sm">Toma fotografías de:
+                    <ul class="list-disc list-inside ml-6 mt-2 space-y-1 text-xs">
                         <li>Material reciclado</li>
                         <li>Pantalla de la balanza mostrando el peso</li>
                         <li>Código QR del estudiante</li>
                     </ul>
                 </li>
-                <li>Registra la actividad</li>
+                <li class="text-sm">Registra la actividad</li>
             </ol>
-            <p class="nota">
-                <mat-icon>info</mat-icon>
-                La actividad quedará pendiente de validación por 2 ONGs antes de que el estudiante reciba sus tokens.
-            </p>
-        </mat-card-content>
-    </mat-card>
+
+            <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div class="flex gap-3">
+                    <i class="fa-solid fa-info-circle text-blue-500 text-lg mt-0.5"></i>
+                    <p class="text-sm text-blue-700 dark:text-blue-300">
+                        La actividad quedará pendiente de validación por 2 ONGs antes de que el estudiante reciba sus tokens.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,25 +1,61 @@
-<mat-nav-list>
-  <div class="logo-section">
-    <h2>🏢 Centro de Acopio</h2>
-    <p>UPAO</p>
+<div class="sidebar-container bg-white dark:bg-[#1e293b] shadow-lg h-screen px-2 py-3 overflow-y-auto transition-all duration-300 flex flex-col fixed left-0 top-0"
+     [ngClass]="(expanded$ | async) ? 'w-[220px] expanded' : 'w-[60px]'">
+
+  <!-- Toggle Button -->
+  <div class="sidebar-item mb-2">
+    <button (click)="toggleSidebar()" class="text-gray-600 dark:text-gray-300 hover:text-[#096754] dark:hover:text-[#0a7a5e] transition-colors p-0 border-none bg-transparent cursor-pointer">
+      <i class="fa-solid fa-bars text-xl"></i>
+    </button>
   </div>
 
-  <mat-divider></mat-divider>
+  <!-- Divider -->
+  <div class="border-t border-gray-200 dark:border-gray-600 my-2"></div>
 
-  <a mat-list-item routerLink="/centro/registrar-actividad" routerLinkActive="active">
-    <mat-icon>add_circle</mat-icon>
-    <span>Registrar Actividad</span>
-  </a>
+  <!-- Title -->
+  <div class="sidebar-item mb-2">
+    <i class="fa-solid fa-building"></i>
+    <span class="sidebar-text">Centro de Acopio</span>
+  </div>
 
-  <a mat-list-item routerLink="/centro/historial" routerLinkActive="active">
-    <mat-icon>history</mat-icon>
-    <span>Historial</span>
-  </a>
+  <!-- Divider -->
+  <div class="border-t border-gray-200 dark:border-gray-600 my-2"></div>
 
-  <mat-divider></mat-divider>
+  <!-- Navigation -->
+  <nav class="flex flex-col gap-1 flex-grow">
+    <button
+      routerLink="/centro/registrar-actividad"
+      routerLinkActive="sidebar-active"
+      class="sidebar-item sidebar-button">
+      <i class="fa-solid fa-plus"></i>
+      <span class="sidebar-text">Registrar Actividad</span>
+    </button>
 
-  <a mat-list-item (click)="logout()">
-    <mat-icon>exit_to_app</mat-icon>
-    <span>Cerrar Sesión</span>
-  </a>
-</mat-nav-list>
+    <button
+      routerLink="/centro/historial"
+      routerLinkActive="sidebar-active"
+      class="sidebar-item sidebar-button">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      <span class="sidebar-text">Historial</span>
+    </button>
+  </nav>
+
+  <!-- Bottom Icons -->
+  <div class="mt-auto flex flex-col gap-1">
+    <!-- User -->
+    <div class="sidebar-item">
+      <i class="fa-solid fa-user-circle"></i>
+      <span class="sidebar-text text-sm">{{ userName }}</span>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-gray-200 dark:border-gray-600 my-2"></div>
+
+    <!-- Logout -->
+    <button
+      (click)="logout()"
+      class="sidebar-item sidebar-button text-red-500 hover:text-red-600">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      <span class="sidebar-text">Cerrar sesión</span>
+    </button>
+  </div>
+</div>

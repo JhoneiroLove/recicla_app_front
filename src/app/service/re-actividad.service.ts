@@ -34,4 +34,8 @@ export class ReActividadService {
       responseType: 'blob',
     });
   }
+
+  public obtenerHistorialCentroAcopio(): Observable<any> {
+    return this.httpClient.get(`${baserUrl}/actividad/historial-centro`);
+  }
 }

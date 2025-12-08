@@ -1,57 +1,88 @@
-<div class="bootstrap-wrapper">
-  <div class="container mt-3 mb-3">
-    <div class="row justify-content-center">
-      <div class="col-9">
-        <h2 class="text-center">Formulario de Registro de Residuos</h2>
+<!-- Modal de Registro de Residuo -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white dark:bg-[#252d3d] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+    <!-- Header del modal -->
+    <div class="sticky top-0 bg-white dark:bg-[#252d3d] border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Registrar Nuevo Residuo</h2>
+      <button (click)="volver()" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+    </div>
 
-        <form [formGroup]="residuoForm" (ngSubmit)="submitForm()">
+    <!-- Body del modal -->
+    <div class="p-6">
+      <form [formGroup]="residuoForm" (ngSubmit)="submitForm()" class="space-y-4">
 
-          <mat-form-field class="full-width" appearance="outline">
-            <mat-label>Nombre</mat-label>
-            <input type="text" matInput formControlName="nombre" placeholder="Ingrese el nombre del residuo" required>
-            <mat-hint>El nombre debe ser único</mat-hint>
-            <mat-error *ngIf="residuoForm.get('nombre')!.invalid && residuoForm.get('nombre')!.touched">
-              El nombre debe tener máximo 25 caracteres y solo puede contener letras y espacios.
-            </mat-error>
-          </mat-form-field>
+        <!-- Nombre -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nombre del Residuo</label>
+          <input type="text" formControlName="nombre"
+                 placeholder="Ej: Botellas de vidrio"
+                 class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+          <p *ngIf="residuoForm.get('nombre')!.invalid && residuoForm.get('nombre')!.touched"
+             class="mt-1 text-sm text-red-500">
+            El nombre debe tener máximo 25 caracteres y solo puede contener letras y espacios.
+          </p>
+        </div>
 
-          <mat-form-field class="full-width" appearance="outline">
-            <mat-label>Descripción</mat-label>
-            <textarea matInput formControlName="descripcion" placeholder="Ingrese la descripción del residuo" required></textarea>
-            <mat-hint>max. 30 caracteres</mat-hint>
-            <mat-error *ngIf="residuoForm.get('descripcion')!.invalid && residuoForm.get('descripcion')!.touched">
-              La descripción debe tener máximo 30 caracteres y solo puede contener letras y espacios.
-            </mat-error>
-          </mat-form-field>
+        <!-- Descripción -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descripción</label>
+          <textarea formControlName="descripcion" rows="2"
+                    placeholder="Describe el tipo de residuo..."
+                    class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors resize-none"></textarea>
+          <p *ngIf="residuoForm.get('descripcion')!.invalid && residuoForm.get('descripcion')!.touched"
+             class="mt-1 text-sm text-red-500">
+            La descripción debe tener máximo 30 caracteres y solo puede contener letras y espacios.
+          </p>
+        </div>
 
-          <mat-form-field class="full-width" appearance="outline">
-            <mat-label>Tipo</mat-label>
-            <mat-select formControlName="tipo" required>
-              <mat-option value="Vidrio">Vidrio</mat-option>
-              <mat-option value="Plástico">Plástico</mat-option>
-              <mat-option value="Papel">Papel</mat-option>
-              <mat-option value="General">General</mat-option>
-            </mat-select>
-            <mat-error *ngIf="residuoForm.get('tipo')!.invalid && residuoForm.get('tipo')!.touched">
+        <!-- Tipo y Puntos en una fila -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Tipo -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo de Residuo</label>
+            <select formControlName="tipo"
+                    class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+              <option value="" disabled selected>Seleccione un tipo</option>
+              <option value="Vidrio">Vidrio</option>
+              <option value="Plástico">Plástico</option>
+              <option value="Papel">Papel</option>
+              <option value="General">General</option>
+            </select>
+            <p *ngIf="residuoForm.get('tipo')!.invalid && residuoForm.get('tipo')!.touched"
+               class="mt-1 text-sm text-red-500">
               El tipo de residuo es requerido.
-            </mat-error>
-          </mat-form-field>
-
-
-          <mat-form-field class="full-width" appearance="outline">
-            <mat-label>Puntos</mat-label>
-            <input type="number" matInput formControlName="puntos" placeholder="Ingrese los puntos asociados al residuo" required>
-            <mat-error *ngIf="residuoForm.get('puntos')!.invalid && residuoForm.get('puntos')!.touched">
-              Los puntos deben ser un número mayor que 0.
-            </mat-error>
-          </mat-form-field>
-
-          <div class="container-box text-center">
-            <button type="submit" mat-raised-button color="primary">Registrar</button>
-            <button type="reset" style="margin-left: 60px;" mat-raised-button color="accent" (click)="onReset()">Limpiar</button>
+            </p>
           </div>
-        </form>
-      </div>
+
+          <!-- Puntos -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Puntos</label>
+            <input type="number" formControlName="puntos"
+                   placeholder="0"
+                   class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+            <p *ngIf="residuoForm.get('puntos')!.invalid && residuoForm.get('puntos')!.touched"
+               class="mt-1 text-sm text-red-500">
+              Los puntos deben ser un número mayor que 0.
+            </p>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex gap-3 pt-4">
+          <button type="button" (click)="volver()"
+                  class="flex-1 px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium">
+            <i class="fa-solid fa-xmark mr-2 text-xs"></i>
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="!residuoForm.valid"
+                  class="flex-1 px-5 py-2.5 bg-[#096754] hover:bg-[#0a7a5e] text-white rounded-lg transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-save mr-2 text-xs"></i>
+            Registrar
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

@@ -1,0 +1,181 @@
+<!-- Header -->
+<div class="mb-8">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-[#096754] rounded-lg flex items-center justify-center">
+        <i class="fa-solid fa-clock-rotate-left text-white text-lg"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Historial de Entregas</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Registro de todas las entregas de reciclaje procesadas</p>
+      </div>
+    </div>
+
+    <!-- Botones de exportación -->
+    <div *ngIf="actividades.data.length > 0" class="flex gap-3">
+      <button (click)="exportarPDF()"
+              class="flex items-center gap-2 px-4 py-2.5 bg-red-600 dark:bg-red-600 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-700 transition-colors font-medium shadow-sm hover:shadow-md">
+        <i class="fa-solid fa-file-pdf"></i>
+        <span class="hidden sm:inline">Exportar PDF</span>
+      </button>
+      <button (click)="exportarCSV()"
+              class="flex items-center gap-2 px-4 py-2.5 bg-green-600 dark:bg-green-600 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-700 transition-colors font-medium shadow-sm hover:shadow-md">
+        <i class="fa-solid fa-file-csv"></i>
+        <span class="hidden sm:inline">Exportar CSV</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+  <!-- Mensaje cuando no hay actividades -->
+  <div *ngIf="actividades.data.length === 0"
+       class="bg-white dark:bg-[#252d3d] rounded-2xl shadow-lg p-12 text-center">
+    <i class="fa-solid fa-inbox text-gray-300 dark:text-gray-600 text-6xl mb-4"></i>
+    <p class="text-gray-600 dark:text-gray-400 text-lg">No hay entregas registradas todavía</p>
+    <p class="text-gray-500 dark:text-gray-500 text-sm mt-2">
+      Las entregas que registres aparecerán aquí
+    </p>
+  </div>
+
+  <!-- Filtros y Tabla -->
+  <div *ngIf="actividades.data.length > 0" class="space-y-6">
+    <!-- Panel de Filtros -->
+    <div class="bg-white dark:bg-[#252d3d] rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
+      <button (click)="mostrarFiltros = !mostrarFiltros"
+              class="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-[#096754] rounded-lg flex items-center justify-center">
+            <i class="fa-solid fa-filter text-white text-sm"></i>
+          </div>
+          <h3 class="text-base font-semibold text-gray-800 dark:text-white">Filtrar historial</h3>
+        </div>
+        <i class="fa-solid transition-transform duration-300 text-gray-600 dark:text-gray-400"
+           [ngClass]="mostrarFiltros ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+      </button>
+
+      <div *ngIf="mostrarFiltros" class="px-6 pb-6 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex flex-wrap gap-4 mt-6">
+          <!-- Buscar por nombre -->
+          <div class="flex-1 max-w-xl">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Buscar por Nombre o Estudiante
+            </label>
+            <div class="relative">
+              <input type="text"
+                     (keyup)="applyFilter($event)"
+                     placeholder="Buscar..."
+                     class="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors placeholder-gray-400">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </div>
+          </div>
+
+          <!-- Filtrar por tipo de residuo -->
+          <div class="w-64">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Tipo de Residuo
+            </label>
+            <select (change)="applyResiduoFilter($event)"
+                    class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#096754] focus:border-transparent bg-white dark:bg-[#1a1f2e] text-gray-900 dark:text-white transition-colors">
+              <option value="">Todos</option>
+              <option *ngFor="let residuo of residuosDisponibles" [value]="residuo.nombre">
+                {{ residuo.nombre }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="bg-white dark:bg-[#252d3d] rounded-2xl shadow-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="actividades" class="w-full">
+
+          <!-- Columna Nombre -->
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              Nombre
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200">
+              {{ actividad.nombre }}
+            </td>
+          </ng-container>
+
+          <!-- Columna Cantidad -->
+          <ng-container matColumnDef="cantidad">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              <div class="flex items-center justify-center gap-2">
+                <span>Cantidad (kg)</span>
+                <button (click)="toggleOrdenCantidad()"
+                        class="text-gray-500 hover:text-[#096754] dark:text-gray-400 dark:hover:text-[#0a7a5e] transition-colors">
+                  <i class="fa-solid" [ngClass]="ordenCantidad === 'asc' ? 'fa-arrow-up-wide-short' : ordenCantidad === 'desc' ? 'fa-arrow-down-wide-short' : 'fa-sort'"></i>
+                </button>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200 text-center">
+              <span class="inline-flex items-center gap-1">
+                <i class="fa-solid fa-weight-scale text-[#096754]"></i>
+                {{ actividad.cantidad }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Columna Residuo -->
+          <ng-container matColumnDef="residuo">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              Tipo de Residuo
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200">
+              <span class="inline-flex items-center gap-2 px-3 py-1 bg-[#096754]/10 text-[#096754] dark:bg-[#096754]/20 dark:text-[#0a7a5e] rounded-full text-sm font-medium">
+                <i class="fa-solid fa-recycle"></i>
+                {{ actividad.residuoNombre }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Columna Puntos Ganados -->
+          <ng-container matColumnDef="puntosGanados">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              Puntos
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200">
+              <span class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-semibold">
+                <i class="fa-solid fa-star"></i>
+                {{ actividad.puntosGanados }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Columna Estudiante -->
+          <ng-container matColumnDef="estudiante">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              Estudiante
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-800 dark:!text-gray-200">
+              <span class="inline-flex items-center gap-2">
+                <i class="fa-solid fa-user text-[#096754]"></i>
+                {{ actividad.usuarioNombre }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Columna Fecha -->
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef class="!bg-gray-50 dark:!bg-[#1a1f2e] !text-gray-700 dark:!text-gray-300 !font-semibold">
+              Fecha
+            </th>
+            <td mat-cell *matCellDef="let actividad" class="!text-gray-600 dark:!text-gray-400 text-sm">
+              <span class="inline-flex items-center gap-1">
+                <i class="fa-solid fa-calendar"></i>
+                {{ actividad.fecha | date: 'short' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              class="hover:bg-gray-50 dark:hover:bg-[#1a1f2e] transition-colors"></tr>
+        </table>
+      </div>
+    </div>
+  </div>
