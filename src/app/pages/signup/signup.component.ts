@@ -184,8 +184,8 @@ export class SignupComponent implements OnInit, OnDestroy {
     }
 
     this.userService.addUsuario(this.signupForm.value).subscribe(
-      (data) => {
-        Swal.fire({
+      async (data) => {
+        await Swal.fire({
           title: 'Usuario guardado',
           html: `
             <p>Usuario registrado con éxito en el sistema</p>
@@ -196,11 +196,43 @@ export class SignupComponent implements OnInit, OnDestroy {
           `,
           icon: 'success',
           confirmButtonText: 'Aceptar',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = '/login';
-          }
         });
+
+        const result = await Swal.fire({
+          title: '¿Agregar token REC a MetaMask?',
+          text: 'Para ver tus tokens de reciclaje en tu wallet',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, agregar',
+          cancelButtonText: 'Después',
+        });
+
+        if (result.isConfirmed) {
+          try {
+            const wasAdded = await this.web3Service.addTokenToMetaMask();
+            if (wasAdded) {
+              await Swal.fire({
+                icon: 'success',
+                title: 'Token agregado',
+                text: 'Ahora verás tus tokens REC en MetaMask',
+                timer: 2000,
+                showConfirmButton: false,
+              });
+            }
+          } catch (error: any) {
+            await Swal.fire({
+              icon: 'info',
+              title: 'No se pudo agregar el token',
+              html: `
+                <p>Puedes agregarlo manualmente después:</p>
+                <p><small><strong>Dirección:</strong> 0x6Ee68256eF29096e8Bc66c14494E5f58650488DD</small></p>
+              `,
+              confirmButtonText: 'Entendido',
+            });
+          }
+        }
+
+        window.location.href = '/login';
       },
 
       (error) => {

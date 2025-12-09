@@ -14,6 +14,19 @@ const HARDHAT_LOCAL = {
   blockExplorerUrls: [],
 };
 
+// Configuración de Sepolia Testnet (Ethereum)
+const SEPOLIA_NETWORK = {
+  chainId: '0xaa36a7', // 11155111 en hexadecimal
+  chainName: 'Sepolia Testnet',
+  nativeCurrency: {
+    name: 'SepoliaETH',
+    symbol: 'ETH',
+    decimals: 18,
+  },
+  rpcUrls: ['https://eth-sepolia.g.alchemy.com/v2/VQ_jKkFIWE-kn56xsm1Is'],
+  blockExplorerUrls: ['https://sepolia.etherscan.io/'],
+};
+
 // Configuración de Polygon Amoy Testnet
 const AMOY_NETWORK = {
   chainId: '0x13882', // 80002 en hexadecimal
@@ -28,7 +41,10 @@ const AMOY_NETWORK = {
 };
 
 // Red activa (cambiar según entorno)
-const ACTIVE_NETWORK = HARDHAT_LOCAL; // Cambiar a AMOY_NETWORK para producción
+// HARDHAT_LOCAL = Desarrollo local
+// SEPOLIA_NETWORK = Testing en testnet de Ethereum
+// AMOY_NETWORK = Testing en testnet de Polygon
+const ACTIVE_NETWORK = SEPOLIA_NETWORK; // 🔥 Ahora usando Sepolia
 
 declare global {
   interface Window {
@@ -249,6 +265,34 @@ export class Web3Service {
   removeAllListeners(): void {
     if (this.ethereum && this.ethereum.removeAllListeners) {
       this.ethereum.removeAllListeners();
+    }
+  }
+
+  async addTokenToMetaMask(): Promise<boolean> {
+    if (!this.isMetaMaskInstalled()) {
+      throw new Error('MetaMask no está instalado');
+    }
+
+    const tokenAddress = '0x6Ee68256eF29096e8Bc66c14494E5f58650488DD';
+    const tokenSymbol = 'REC';
+    const tokenDecimals = 18;
+
+    try {
+      const wasAdded = await this.ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: tokenAddress,
+            symbol: tokenSymbol,
+            decimals: tokenDecimals,
+          },
+        },
+      });
+
+      return wasAdded;
+    } catch (error: any) {
+      throw new Error('Error al agregar token: ' + error.message);
     }
   }
 }
